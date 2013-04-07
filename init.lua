@@ -114,23 +114,22 @@ local BOX_BROWN = {
 	fixed = {
 		{-0.15, -0.2, -0.15, 0.15, -0.1, 0.15},
 		{-0.2, -0.3, -0.2, 0.2, -0.2, 0.2},
-		{-0.05, -0.5, -0.05, 0.05, -0.3, 0.05},
+		{-0.05, -0.5, -0.05, 0.05, -0.3, 0.05}
+	},
+}
+
+local BOX_FLY_AGARIC = {
+	type = "fixed",
+	fixed = {
+		{-0.05, -0.5, -0.05, 0.05, 1/20, 0.05},
+		{-3/20, -6/20, -3/20, 3/20, 0, 3/20},
+		{-4/20, -2/20, -4/20, 4/20, -4/20, 4/20},
 	},
 }
 
 pilz("brown", "Brown Mushroom", BOX_BROWN)
 pilz("red", "Red Mushroom", BOX_RED)
-
-minetest.register_node("riesenpilz:fly_agaric", {
-	description = "Fly Agaric",
-	tile_images = {"riesenpilz_fly_agaric_side.png"},
-	inventory_image = "riesenpilz_fly_agaric_side.png",
-	walkable = false,
-	paramtype = "light",
-	drawtype = "plantlike",
-	groups = {snappy=3,flammable=2},
-	sounds =  default.node_sound_leaves_defaults(),
-})
+pilz("fly_agaric", "Fly Agaric", BOX_FLY_AGARIC)
 
 
 
