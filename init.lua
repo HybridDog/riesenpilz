@@ -79,6 +79,66 @@ local function minecraft_fliegenpilz(pos)
 end
 
 
+local function add_head_lavashroom(pos, ran)
+	local head = "wool:orange"
+	if math.random(ran) == 1 then
+		head = "wool:yellow"
+	else
+		head = "wool:orange"
+	end
+	minetest.env:add_node(pos, {name=head})
+end
+
+local function lavashroom(pos)
+	local height = 3+math.random(MAX_SIZE-2)
+	minetest.env:remove_node(pos)	
+
+	for i = 0, height, 1 do
+		for k = -1, 1, 2 do
+			minetest.env:add_node({x=pos.x+k, y=pos.y+i, z=pos.z}, {name="wool:brown"})
+			minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z+k}, {name="wool:brown"})
+		end
+	end
+
+	for k = -3, 3, 1 do
+		for l = -3, 3, 1 do
+			if ( k <= 1 and k >= -1 )
+			or( l <= 1 and l >= -1 ) then
+				minetest.env:add_node({x=pos.x+k, y=pos.y+height+2, z=pos.z+l}, {name="wool:brown"})
+			else
+				add_head_lavashroom({x=pos.x+k, y=pos.y+height+2, z=pos.z+l}, 7)
+			end
+		end
+	end
+
+	for k = -2, 2, 1 do
+		for l = -2, 2, 1 do
+			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name="wool:brown"})
+		end
+	end
+
+	for j = 0, 1, 1 do
+		for k = -4, 4, 1 do
+			for l = -4, 4, 1 do
+				add_head_lavashroom({x=pos.x+k, y=pos.y+height+3+j, z=pos.z+l}, 6)
+			end
+		end
+	end
+
+	for k = -3, 3, 1 do
+		for l = -3, 3, 1 do
+			add_head_lavashroom({x=pos.x+k, y=pos.y+height+5, z=pos.z+l}, 5)
+		end
+	end
+
+	for k = -2, 2, 1 do
+		for l = -2, 2, 1 do
+			add_head_lavashroom({x=pos.x+k, y=pos.y+height+6, z=pos.z+l}, 4)
+		end
+	end
+end
+
+
 
 --Mushroom Nodes
 
@@ -127,9 +187,34 @@ local BOX_FLY_AGARIC = {
 	},
 }
 
+local BOX_LAVASHROOM = {
+	type = "fixed",
+	fixed = {
+		{-1/16, -8/16, -1/16, 1/16, -6/16, 1/16},
+		{-2/16, -6/16, -2/16, 2/16,     0, 2/16},
+		{-3/16, -5/16, -3/16, 3/16, -1/16, 3/16},
+		{-4/16, -4/16, -4/16, 4/16, -2/16, 4/16},
+	},
+}
+
+local BOX_GLOWSHROOM = {
+	type = "fixed",
+	fixed = {
+		{-1/16, -8/16, -1/16, 1/16, -1/16, 1/16},
+		{-2/16, -3/16, -2/16, 2/16, -2/16, 2/16},
+		{-3/16, -5/16, -3/16, 3/16, -3/16, 3/16},
+		{-3/16, -7/16, -3/16, -2/16, -5/16, -2/16},
+		{3/16, -7/16, -3/16, 2/16, -5/16, -2/16},
+		{-3/16, -7/16, 3/16, -2/16, -5/16, 2/16},
+		{3/16, -7/16, 3/16, 2/16, -5/16, 2/16},
+	},
+}
+
 pilz("brown", "Brown Mushroom", BOX_BROWN)
 pilz("red", "Red Mushroom", BOX_RED)
 pilz("fly_agaric", "Fly Agaric", BOX_FLY_AGARIC)
+pilz("lavashroom", "Lavashroom", BOX_LAVASHROOM)
+pilz("glowshroom", "Glowshroom", BOX_GLOWSHROOM)
 
 
 
@@ -181,6 +266,8 @@ minetest.register_on_punchnode(function(pos, node, puncher)
 			minecraft_fliegenpilz(pos)
 		elseif minetest.env:get_node(pos).name == "riesenpilz:brown" then
 			brauner_minecraftpilz(pos)
+		elseif minetest.env:get_node(pos).name == "riesenpilz:lavashroom" then
+			lavashroom(pos)
 		end
 	end
 end)
