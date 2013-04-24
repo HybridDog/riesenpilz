@@ -8,7 +8,7 @@ local MAX_SIZE = 3
 --Growing Functions
 
 
-local function hybridpilz(pos)
+function riesenpilz_hybridpilz(pos)
 	local random = math.random(MAX_SIZE)
 	local height = 2 + random
 	local breite = random
@@ -40,7 +40,7 @@ local function hybridpilz(pos)
 end
 
 
-local function brauner_minecraftpilz(pos)
+function riesenpilz_brauner_minecraftpilz(pos)
 	local random = math.random(MAX_SIZE-1)
 	local height = 3+random
 	local breite = 2+random
@@ -58,7 +58,7 @@ local function brauner_minecraftpilz(pos)
 end
 
 
-local function minecraft_fliegenpilz(pos)
+function riesenpilz_minecraft_fliegenpilz(pos)
 	local height = 3
 
 	for i = 0, height, 1 do
@@ -248,6 +248,14 @@ minetest.register_node("riesenpilz:head_red_side", {
 				{items = {"riesenpilz:head_red"},rarity = 1,}}},
 })
 
+minetest.register_node("riesenpilz:ground", {
+	description = "Grass?",
+	tile_images = {"riesenpilz_ground_top.png","default_dirt.png","default_dirt.png^riesenpilz_ground_side.png"},
+	groups = {crumbly=3},
+	sounds = default.node_sound_dirt_defaults(),
+	drop = 'default:dirt'
+})
+
 
 
 --Growing
@@ -261,13 +269,23 @@ minetest.register_tool("riesenpilz:growingtool", {
 minetest.register_on_punchnode(function(pos, node, puncher)
 	if puncher:get_wielded_item():get_name() == "riesenpilz:growingtool" then
 		if minetest.env:get_node(pos).name == "riesenpilz:red" then
-			hybridpilz(pos)
+			riesenpilz_hybridpilz(pos)
 		elseif minetest.env:get_node(pos).name == "riesenpilz:fly_agaric" then
-			minecraft_fliegenpilz(pos)
+			riesenpilz_minecraft_fliegenpilz(pos)
 		elseif minetest.env:get_node(pos).name == "riesenpilz:brown" then
-			brauner_minecraftpilz(pos)
+			riesenpilz_brauner_minecraftpilz(pos)
 		elseif minetest.env:get_node(pos).name == "riesenpilz:lavashroom" then
 			lavashroom(pos)
 		end
 	end
 end)
+
+
+
+riesenpilz = {}
+dofile(minetest.get_modpath("riesenpilz").."/settings.lua")
+if riesenpilz.enable_mapgen then
+	dofile(minetest.get_modpath("riesenpilz") .. "/mapgen.lua")
+end
+
+print("[riesenpilz] Loaded!") 
