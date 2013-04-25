@@ -41,18 +41,26 @@ end
 
 
 function riesenpilz_brauner_minecraftpilz(pos)
+	local head = "riesenpilz:head_brown"
 	local random = math.random(MAX_SIZE-1)
-	local height = 3+random
-	local breite = 2+random
+	local br	 = random+1
+	local breite = br+1
+	local height = br+2
 
 	for i = 0, height, 1 do
 		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="riesenpilz:stem"})
 	end
 
-	for j = -breite, breite, 1 do
-		for k = -(breite-1), breite-1, 1 do
-			minetest.env:add_node({x=pos.x+j, y=pos.y+height+1, z=pos.z+k}, {name="riesenpilz:head_brown"})
-			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+j}, {name="riesenpilz:head_brown"})
+	for k = -breite, breite, breite*2 do
+		for l = -br, br, 1 do
+			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=head})
+			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+k}, {name=head})
+		end
+	end
+
+	for j = -br, br, 1 do
+		for k = -br, br, 1 do
+			minetest.env:add_node({x=pos.x+j, y=pos.y+height+1, z=pos.z+k}, {name=head})
 		end
 	end
 end
@@ -80,23 +88,39 @@ end
 
 
 local function add_head_lavashroom(pos, ran)
-	local head = "wool:orange"
+	local head = "riesenpilz:head_orange"
 	if math.random(ran) == 1 then
-		head = "wool:yellow"
+		head = "riesenpilz:head_yellow"
 	else
-		head = "wool:orange"
+		head = "riesenpilz:head_orange"
 	end
 	minetest.env:add_node(pos, {name=head})
 end
 
-local function lavashroom(pos)
+local function add_top_lavashroom(pos,h,ran,a)
+	for k = -a, a, 2*a do
+		for l = -a+1, a-1, 1 do
+			add_head_lavashroom({x=pos.x+k, y=pos.y+h, z=pos.z+l}, ran)
+			add_head_lavashroom({x=pos.x+l, y=pos.y+h, z=pos.z+k}, ran)
+		end
+	end
+	for k = -a, a, 2*a do
+		for l = -a, a, 2*a do
+			add_head_lavashroom({x=pos.x+k, y=pos.y+h, z=pos.z+l}, ran)
+		end
+	end
+end
+
+function riesenpilz_lavashroom(pos)
+	local stem = "riesenpilz:stem_brown"
+	local brown = "riesenpilz:head_brown_full"
 	local height = 3+math.random(MAX_SIZE-2)
 	minetest.env:remove_node(pos)	
 
 	for i = 0, height, 1 do
 		for k = -1, 1, 2 do
-			minetest.env:add_node({x=pos.x+k, y=pos.y+i, z=pos.z}, {name="wool:brown"})
-			minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z+k}, {name="wool:brown"})
+			minetest.env:add_node({x=pos.x+k, y=pos.y+i, z=pos.z}, {name=stem})
+			minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z+k}, {name=stem})
 		end
 	end
 
@@ -104,32 +128,46 @@ local function lavashroom(pos)
 		for l = -3, 3, 1 do
 			if ( k <= 1 and k >= -1 )
 			or( l <= 1 and l >= -1 ) then
-				minetest.env:add_node({x=pos.x+k, y=pos.y+height+2, z=pos.z+l}, {name="wool:brown"})
+				if not ( k <= 1 and k >= -1 and l <= 1 and l >= -1 ) then
+					minetest.env:add_node({x=pos.x+k, y=pos.y+height+2, z=pos.z+l}, {name=brown})
+				end
 			else
 				add_head_lavashroom({x=pos.x+k, y=pos.y+height+2, z=pos.z+l}, 7)
 			end
 		end
 	end
 
-	for k = -2, 2, 1 do
-		for l = -2, 2, 1 do
-			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name="wool:brown"})
+	for k = -1, 1, 1 do
+		for l = -2, 2, 4 do
+			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=brown})
+			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+k}, {name=brown})
+		end
+	end
+	for k = -2, 2, 4 do
+		for l = -2, 2, 4 do
+			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=brown})
 		end
 	end
 
+	for k = -1, 1, 2 do
+		for l = -1, 1, 2 do
+			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=brown})
+		end
+	end
+
+--	add_top_lavashroom(pos,height+3,6,4)
+--	add_top_lavashroom(pos,height+4,6,4)
+--	round edges:
 	for j = 0, 1, 1 do
-		for k = -4, 4, 1 do
-			for l = -4, 4, 1 do
+		for k = -4, 4, 8 do
+			for l = -3, 3, 1 do
 				add_head_lavashroom({x=pos.x+k, y=pos.y+height+3+j, z=pos.z+l}, 6)
+				add_head_lavashroom({x=pos.x+l, y=pos.y+height+3+j, z=pos.z+k}, 6)
 			end
 		end
 	end
 
-	for k = -3, 3, 1 do
-		for l = -3, 3, 1 do
-			add_head_lavashroom({x=pos.x+k, y=pos.y+height+5, z=pos.z+l}, 5)
-		end
-	end
+	add_top_lavashroom(pos,height+5,5,3)
 
 	for k = -2, 2, 1 do
 		for l = -2, 2, 1 do
@@ -233,9 +271,15 @@ minetest.register_node("riesenpilz:"..name, {
 end
 
 pilznode("stem", "Giant Mushroom Stem", {"riesenpilz_stem_top.png","riesenpilz_stem_top.png","riesenpilz_stem.png"}, "stem")
+pilznode("stem_brown", "Giant Mushroom Stem Brown",
+{"riesenpilz_stem_top.png","riesenpilz_stem_top.png","riesenpilz_stem_brown.png"}, "stem_brown")
 pilznode("lamellas", "Giant Mushroom Lamella", {"riesenpilz_lamellas.png"}, "lamellas")
 pilznode("head_red", "Giant Mushroom Head Red", {"riesenpilz_head.png", "riesenpilz_lamellas.png", "riesenpilz_head.png"}, "red")
-pilznode("head_brown", "Giant Mushroom Head Brown", {"riesenpilz_brown_top.png","riesenpilz_lamellas.png","riesenpilz_brown_top.png"}, "brown")
+pilznode("head_orange", "Giant Mushroom Head Red", {"riesenpilz_head_orange.png"}, "lavashroom")
+pilznode("head_yellow", "Giant Mushroom Head Red", {"riesenpilz_head_yellow.png"}, "lavashroom")
+pilznode("head_brown", "Giant Mushroom Head Brown",
+{"riesenpilz_brown_top.png","riesenpilz_lamellas.png","riesenpilz_brown_top.png"}, "brown")
+pilznode("head_brown_full", "Giant Mushroom Head Full Brown", {"riesenpilz_brown_top.png"},"brown")
 
 minetest.register_node("riesenpilz:head_red_side", {
 	description = "Giant Mushroom Head Side",
@@ -275,7 +319,7 @@ minetest.register_on_punchnode(function(pos, node, puncher)
 		elseif minetest.env:get_node(pos).name == "riesenpilz:brown" then
 			riesenpilz_brauner_minecraftpilz(pos)
 		elseif minetest.env:get_node(pos).name == "riesenpilz:lavashroom" then
-			lavashroom(pos)
+			riesenpilz_lavashroom(pos)
 		end
 	end
 end)
