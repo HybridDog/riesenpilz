@@ -154,6 +154,50 @@ function riesenpilz_lavashroom(pos)
 end
 
 
+function riesenpilz_glowshroom(pos)
+	local stem = "riesenpilz:stem_blue"
+	local height = 2+math.random(MAX_SIZE)
+	local br = 2
+
+	for i = 0, height, 1 do
+		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name=stem})
+	end
+
+	for l = 1, height, 1 do
+
+		local head = "riesenpilz:head_blue"
+		if l == 1 then
+			head = "riesenpilz:head_blue_bright"
+		end
+
+		for i = -br, br, 2*br do
+			for k = -br, br, 2*br do
+				minetest.env:add_node({x=pos.x+i, y=pos.y+l, z=pos.z+k}, {name=head})
+			end
+		end
+	end
+
+	local head = "riesenpilz:head_blue"
+
+	for l = 0, br, 1 do
+		for i = -br+l, br-l, 1 do
+			for k = -br+l, br-l, 1 do
+				minetest.env:add_node({x=pos.x+i, y=pos.y+height+1+l, z=pos.z+k}, {name=head})
+			end
+		end
+	end
+
+	local a = br
+	local h = height
+	for k = -1, 1, 2 do
+		for l = -a+1, a, 1 do
+			minetest.env:add_node({x=pos.x+a*k, y=pos.y+h, z=pos.z-l*k}, {name=head})
+			minetest.env:add_node({x=pos.x+l*k, y=pos.y+h, z=pos.z+a*k}, {name=head})
+		end
+	end
+end
+
+
 
 --Mushroom Nodes
 
@@ -257,6 +301,10 @@ pilznode("head_yellow", "Giant Mushroom Head Red", {"riesenpilz_head_yellow.png"
 pilznode("head_brown", "Giant Mushroom Head Brown",
 {"riesenpilz_brown_top.png","riesenpilz_lamellas.png","riesenpilz_brown_top.png"}, "brown")
 pilznode("head_brown_full", "Giant Mushroom Head Full Brown", {"riesenpilz_brown_top.png"},"brown")
+pilznode("head_blue_bright", "Giant Mushroom Head Blue Bright", {"riesenpilz_head_blue_bright.png"},"glowshroom")
+pilznode("head_blue", "Giant Mushroom Head Blue", {"riesenpilz_head_blue.png"},"glowshroom")
+pilznode("stem_blue", "Giant Mushroom Stem Blue",
+{"riesenpilz_stem_top.png","riesenpilz_stem_top.png","riesenpilz_stem_blue.png"}, "stem_blue")
 
 minetest.register_node("riesenpilz:head_red_side", {
 	description = "Giant Mushroom Head Side",
@@ -297,6 +345,8 @@ minetest.register_on_punchnode(function(pos, node, puncher)
 			riesenpilz_brauner_minecraftpilz(pos)
 		elseif minetest.env:get_node(pos).name == "riesenpilz:lavashroom" then
 			riesenpilz_lavashroom(pos)
+		elseif minetest.env:get_node(pos).name == "riesenpilz:glowshroom" then
+			riesenpilz_glowshroom(pos)
 		end
 	end
 end)
