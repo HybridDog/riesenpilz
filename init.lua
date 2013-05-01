@@ -9,32 +9,26 @@ local MAX_SIZE = 3
 
 
 function riesenpilz_hybridpilz(pos)
-	local random = math.random(MAX_SIZE)
-	local height = 2 + random
-	local breite = random
+	local breite = math.random(MAX_SIZE)
 	local br = breite+1
+	local height = breite+2
+	local head = "riesenpilz:head_red"
 
 	for i = 0, height, 1 do
 		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="riesenpilz:stem"})
 	end
 
-	for j = -br, br, 1 do
-		for k = -br, br, 1 do
-			local o = {x=pos.x+j, y=pos.y+height, z=pos.z+k}
-	  		if	k == br
-	  		or	k == -br
-	  		or	j == br
-	  		or	j == -br	then
-				minetest.env:add_node(o, {name="riesenpilz:head_red"})
-			else
-				minetest.env:add_node(o, {name="riesenpilz:lamellas"})
-			end
+	for l = -br+1, br, 1 do
+		for k = -1, 1, 2 do
+			minetest.env:add_node({x=pos.x+br*k, y=pos.y+height, z=pos.z-l*k}, {name=head})
+			minetest.env:add_node({x=pos.x+l*k, y=pos.y+height, z=pos.z+br*k}, {name=head})
 		end
 	end
 
-	for l = -breite, breite, 1 do
-		for m = -breite, breite, 1 do
-			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+m}, {name="riesenpilz:head_red"})
+	for k = -breite, breite, 1 do
+		for l = -breite, breite, 1 do
+			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+k}, {name=head})
+			minetest.env:add_node({x=pos.x+l, y=pos.y+height,	z=pos.z+k}, {name="riesenpilz:lamellas"})
 		end
 	end
 end
@@ -51,16 +45,13 @@ function riesenpilz_brauner_minecraftpilz(pos)
 		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="riesenpilz:stem"})
 	end
 
-	for k = -breite, breite, breite*2 do
-		for l = -br, br, 1 do
+	for l = -br, br, 1 do
+		for k = -breite, breite, breite*2 do
 			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=head})
 			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+k}, {name=head})
 		end
-	end
-
-	for j = -br, br, 1 do
 		for k = -br, br, 1 do
-			minetest.env:add_node({x=pos.x+j, y=pos.y+height+1, z=pos.z+k}, {name=head})
+			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+k}, {name=head})
 		end
 	end
 end
@@ -97,20 +88,6 @@ local function add_head_lavashroom(pos, ran)
 	minetest.env:add_node(pos, {name=head})
 end
 
-local function add_top_lavashroom(pos,h,ran,a)
-	for k = -a, a, 2*a do
-		for l = -a+1, a-1, 1 do
-			add_head_lavashroom({x=pos.x+k, y=pos.y+h, z=pos.z+l}, ran)
-			add_head_lavashroom({x=pos.x+l, y=pos.y+h, z=pos.z+k}, ran)
-		end
-	end
-	for k = -a, a, 2*a do
-		for l = -a, a, 2*a do
-			add_head_lavashroom({x=pos.x+k, y=pos.y+h, z=pos.z+l}, ran)
-		end
-	end
-end
-
 function riesenpilz_lavashroom(pos)
 	local stem = "riesenpilz:stem_brown"
 	local brown = "riesenpilz:head_brown_full"
@@ -137,21 +114,23 @@ function riesenpilz_lavashroom(pos)
 		end
 	end
 
-	for k = -1, 1, 1 do
-		for l = -2, 2, 4 do
+	for l = -2, 2, 4 do
+		for k = -1, 1, 1 do
 			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=brown})
 			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+k}, {name=brown})
 		end
-	end
-	for k = -2, 2, 4 do
-		for l = -2, 2, 4 do
-			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=brown})
+		for i = -2, 2, 4 do
+			minetest.env:add_node({x=pos.x+i, y=pos.y+height+1, z=pos.z+l}, {name=brown})
 		end
 	end
 
 	for k = -1, 1, 2 do
 		for l = -1, 1, 2 do
 			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=brown})
+		end
+		for l = -3+1, 3, 1 do
+			add_head_lavashroom({x=pos.x+3*k, y=pos.y+height+5, z=pos.z-l*k}, 5)
+			add_head_lavashroom({x=pos.x+l*k, y=pos.y+height+5, z=pos.z+3*k}, 5)
 		end
 	end
 
@@ -166,8 +145,6 @@ function riesenpilz_lavashroom(pos)
 			end
 		end
 	end
-
-	add_top_lavashroom(pos,height+5,5,3)
 
 	for k = -2, 2, 1 do
 		for l = -2, 2, 1 do
