@@ -198,6 +198,70 @@ function riesenpilz_glowshroom(pos)
 end
 
 
+function riesenpilz_apple(pos)
+	local size = 5
+	local a = size*2
+	local b = size-1
+	local red = "default:copperblock"
+	local brown = "default:desert_stone"
+	for l = -b, b, 1 do
+		for j = 1, a-1, 1 do
+			for k = -size, size, a do
+				minetest.env:add_node({x=pos.x+k, y=pos.y+j, z=pos.z+l}, {name=red})
+				minetest.env:add_node({x=pos.x+l, y=pos.y+j, z=pos.z+k}, {name=red})
+			end
+		end
+		for i = -b, b, 1 do
+			minetest.env:add_node({x=pos.x+i, y=pos.y, z=pos.z+l}, {name=red})
+			minetest.env:add_node({x=pos.x+i, y=pos.y+a, z=pos.z+l}, {name=red})
+		end
+	end
+
+	for i = a+1, a+b, 1 do
+		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="default:tree"})
+	end
+
+	local c = pos.y+1
+	for i = -3,1,1 do
+		minetest.env:add_node({x=pos.x+i, y=c, z=pos.z+1}, {name=brown})
+	end
+	for i = 0,1,1 do
+		minetest.env:add_node({x=pos.x+1+i, y=c, z=pos.z-1-i}, {name=brown})
+		minetest.env:add_node({x=pos.x+2+i, y=c, z=pos.z-1-i}, {name=brown})
+	end
+	minetest.env:add_node({x=pos.x+1, y=c, z=pos.z}, {name=brown})
+	minetest.env:add_node({x=pos.x-3, y=c+1, z=pos.z+1}, {name=brown})
+end
+
+
+
+--3D apple [3apple]
+
+
+minetest.register_node(":default:apple", {
+	description = "Apple",
+	drawtype = "nodebox",
+	visual_scale = 1.0,
+	tiles = {"3apple_apple_top.png","3apple_apple_bottom.png","3apple_apple.png"},
+	inventory_image = "default_apple.png",
+	paramtype = "light",
+	sunlight_propagates = true,
+	node_box = {
+		type = "fixed",
+		fixed = {
+		{-3/16,	-7/16,	-3/16,	3/16,	1/16,	3/16},
+		{-1/4,	-3/8,	-3/16,	1/4,	0,		3/16},
+		{-3/16,	-3/8,	-1/4,	3/16,	0,		1/4},
+		{0,		1/16,	-1/16,	1/16,	1/4,	0},
+		{-1/16,	1/16,		0,	0,		1/4,	1/16},
+		}
+	},
+	groups = {fleshy=3,dig_immediate=3,flammable=2},
+	on_use = minetest.item_eat(4),
+	sounds = default.node_sound_defaults(),
+})
+
+
 
 --Mushroom Nodes
 
@@ -347,6 +411,8 @@ minetest.register_on_punchnode(function(pos, node, puncher)
 			riesenpilz_lavashroom(pos)
 		elseif minetest.env:get_node(pos).name == "riesenpilz:glowshroom" then
 			riesenpilz_glowshroom(pos)
+		elseif minetest.env:get_node(pos).name == "default:apple" then
+			riesenpilz_apple(pos)
 		end
 	end
 end)

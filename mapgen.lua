@@ -1,3 +1,32 @@
+--[[
+function riesenpilz_circle(nam, pos, radius, rand, seed)
+	local ra = seed
+	for i = -radius, radius, 1 do
+		for j = -radius, radius, 1 do
+			if math.floor(	math.sqrt(i^2+j^2)	+0.5) == radius then
+				random = PseudoRandom(ra)
+				p={x=pos.x+i, y=pos.y, z=pos.z+j}
+				if minetest.env:get_node(p).name == "air"
+				and random:next(1,rand) == 1
+				and minetest.env:get_node({x=pos.x+i, y=pos.y-1, z=pos.z+j}).name ~= "air" then
+					minetest.env:add_node(p, {name=nam})
+				end
+				ra = ra+1
+			end
+		end
+	end
+end
+						elseif pr:next(1,80) == 1 then
+							riesenpilz_circle("riesenpilz:brown", boden, pr:next(2,3), 3, seed)
+						elseif pr:next(1,90) == 1 then
+							riesenpilz_circle("riesenpilz:red", boden, pr:next(3,4), 3, seed)
+						elseif pr:next(1,100) == 1 then
+							riesenpilz_circle("riesenpilz:fly_agaric", boden, 3, 3, seed)
+						elseif pr:next(1,4000) == 1 then
+							riesenpilz_circle("riesenpilz:lavashroom", boden, pr:next(4,5), 3, seed)
+						elseif pr:next(1,5000) == 1 then
+							riesenpilz_circle("riesenpilz:glowshroom", boden, 2, 3, seed)
+]]
 local function find_ground(pos, nodes)
 	for _, evground in ipairs(nodes) do
 		if minetest.env:get_node(pos).name == evground then
@@ -101,6 +130,47 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								break
 							end
 						end
+					end
+				end
+			end
+		end
+	end
+	if maxp.y < -10 then
+		local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
+		local env = minetest.env	--Should make things a bit faster.
+		local perlin1 = env:get_perlin(11,3, 0.5, 200)	--Get map specific perlin
+
+		--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
+		and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
+		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
+		if not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
+		and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > 0.53 )--top middle
+		and not (perlin1:get2d({x=x1, y=z1}) > 0.53) 						--bottom right
+		and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > 0.53) 			--right middle
+		and not (perlin1:get2d({x=x0, y=z1}) > 0.53)  						--bottom left
+		and not (perlin1:get2d({x=x1, y=z0}) > 0.53)						--top right
+		and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > 0.53) 			--left middle
+		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) 			--middle
+		and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > 0.53) then		--bottom middle
+			print("abortsumpf")
+			return
+		end
+		local divs = (maxp.x-minp.x);
+		local pr = PseudoRandom(seed+68)
+
+		for j=0,divs do
+			for i=0,divs do
+				local x,z = x0+i,z0+j
+
+				for y=minp.y,maxp.y,1 do
+					local pos = {x=x, y=y, z=z}
+
+					if env:get_node(pos).name == "air"
+					and env:get_node({x=x, y=y-1, z=z}).name == "default:stone"
+					and pr:next(1,40) == 33
+					and env:find_node_near(pos, 4, "group:igniter")
+					and not env:find_node_near(pos, 3, "group:igniter") then
+						env:add_node(pos, {name="riesenpilz:lavashroom"})
 					end
 				end
 			end
