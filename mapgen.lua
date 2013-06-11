@@ -16,6 +16,7 @@ function riesenpilz_circle(nam, pos, radius, rand, seed)
 		end
 	end
 end
+
 						elseif pr:next(1,80) == 1 then
 							riesenpilz_circle("riesenpilz:brown", boden, pr:next(2,3), 3, seed)
 						elseif pr:next(1,90) == 1 then
@@ -27,6 +28,19 @@ end
 						elseif pr:next(1,5000) == 1 then
 							riesenpilz_circle("riesenpilz:glowshroom", boden, 2, 3, seed)
 ]]
+function riesenpilz_circle(nam, pos, radius, chance)
+	for i = -radius, radius, 1 do
+		for j = -radius, radius, 1 do
+			if math.floor(	math.sqrt(i^2+j^2)	+0.5) == radius
+			and minetest.env:get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name == "air"
+			and math.random(1,chance) == 1
+			and minetest.env:get_node({x=pos.x+i, y=pos.y-1, z=pos.z+j}).name == "riesenpilz:ground" then
+				minetest.env:add_node({x=pos.x+i, y=pos.y, z=pos.z+j}, {name=nam})
+			end
+		end
+	end
+end
+
 local function find_ground(pos, nodes)
 	for _, evground in ipairs(nodes) do
 		if minetest.env:get_node(pos).name == evground then
@@ -99,28 +113,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 					end
 					if ground_y then
-						local boden = {x=x,y=ground_y+1,z=z}
-						if pr:next(1,15) == 1 then
-							env:add_node(boden, {name="default:dry_shrub"})
-						elseif pr:next(1,80) == 1 then
-							env:add_node(boden, {name="riesenpilz:brown"})
-						elseif pr:next(1,90) == 1 then
-							env:add_node(boden, {name="riesenpilz:red"})
-						elseif pr:next(1,100) == 1 then
-							env:add_node(boden, {name="riesenpilz:fly_agaric"})
-						elseif pr:next(1,4000) == 1 then
-							env:add_node(boden, {name="riesenpilz:lavashroom"})
-						elseif pr:next(1,5000) == 1 then
-							env:add_node(boden, {name="riesenpilz:glowshroom"})
-						elseif pr:next(1,380) == 1 then
-							riesenpilz_hybridpilz(boden)
-						elseif pr:next(1,340) == 10 then
-							riesenpilz_brauner_minecraftpilz(boden)
-						elseif pr:next(1,390) == 20 then
-							riesenpilz_minecraft_fliegenpilz(boden)
-						elseif pr:next(1,6000) == 2 and pr:next(1,200) == 15 then
-							riesenpilz_lavashroom(boden)
-						end
 						env:add_node({x=x,y=ground_y,z=z}, {name="riesenpilz:ground"})
 						for i = -1,-5,-1 do
 							local pos = {x=x,y=ground_y+i,z=z}
@@ -129,6 +121,38 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							else
 								break
 							end
+						end
+						local boden = {x=x,y=ground_y+1,z=z}
+						if pr:next(1,15) == 1 then
+							env:add_node(boden, {name="default:dry_shrub"})
+						elseif pr:next(1,80) == 1 then
+							riesenpilz_circle("riesenpilz:brown", boden, pr:next(3,4), 3)
+						elseif pr:next(1,90) == 1 then
+							riesenpilz_circle("riesenpilz:red", boden, pr:next(4,5), 3)
+						elseif pr:next(1,100) == 1 then
+							riesenpilz_circle("riesenpilz:fly_agaric", boden, 4, 3)
+						elseif pr:next(1,4000) == 1 then
+							riesenpilz_circle("riesenpilz:lavashroom", boden, pr:next(5,6), 3)
+						elseif pr:next(1,5000) == 1 then
+							riesenpilz_circle("riesenpilz:glowshroom", boden, 3, 3)
+						--[[elseif pr:next(1,80) == 1 then
+							env:add_node(boden, {name="riesenpilz:brown"})
+						elseif pr:next(1,90) == 1 then
+							env:add_node(boden, {name="riesenpilz:red"})
+						elseif pr:next(1,100) == 1 then
+							env:add_node(boden, {name="riesenpilz:fly_agaric"})
+						elseif pr:next(1,4000) == 1 then
+							env:add_node(boden, {name="riesenpilz:lavashroom"})
+						elseif pr:next(1,5000) == 1 then
+							env:add_node(boden, {name="riesenpilz:glowshroom"})]]
+						elseif pr:next(1,380) == 1 then
+							riesenpilz_hybridpilz(boden)
+						elseif pr:next(1,340) == 10 then
+							riesenpilz_brauner_minecraftpilz(boden)
+						elseif pr:next(1,390) == 20 then
+							riesenpilz_minecraft_fliegenpilz(boden)
+						elseif pr:next(1,6000) == 2 and pr:next(1,200) == 15 then
+							riesenpilz_lavashroom(boden)
 						end
 					end
 				end
