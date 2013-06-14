@@ -94,56 +94,45 @@ function riesenpilz_lavashroom(pos)
 	local height = 3+math.random(MAX_SIZE-2)
 	minetest.env:remove_node(pos)	
 
-	for i = 0, height, 1 do
-		for k = -1, 1, 2 do
-			minetest.env:add_node({x=pos.x+k, y=pos.y+i, z=pos.z}, {name=stem})
-			minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z+k}, {name=stem})
-		end
-	end
+	for i = -1, 1, 2 do
+		local o = 2*i
 
-	for k = -3, 3, 1 do
-		for l = -3, 3, 1 do
-			if ( k <= 1 and k >= -1 )
-			or( l <= 1 and l >= -1 ) then
-				if not ( k <= 1 and k >= -1 and l <= 1 and l >= -1 ) then
-					minetest.env:add_node({x=pos.x+k, y=pos.y+height+2, z=pos.z+l}, {name=brown})
+		for n = 0, height, 1 do
+			minetest.env:add_node({x=pos.x+i, y=pos.y+n, z=pos.z}, {name=stem})
+			minetest.env:add_node({x=pos.x, y=pos.y+n, z=pos.z+i}, {name=stem})
+		end
+
+		for l = -1, 1, 1 do
+			for k = 2, 3, 1 do
+				minetest.env:add_node({x=pos.x+k*i, y=pos.y+height+2, z=pos.z+l}, {name=brown})
+				minetest.env:add_node({x=pos.x+l, y=pos.y+height+2, z=pos.z+k*i}, {name=brown})
+			end
+			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+o}, {name=brown})
+			minetest.env:add_node({x=pos.x+o, y=pos.y+height+1, z=pos.z+l}, {name=brown})
+		end
+
+		for m = -1, 1, 2 do
+			for k = 2, 3, 1 do
+				for j = 2, 3, 1 do
+					add_head_lavashroom({x=pos.x+j*i, y=pos.y+height+2, z=pos.z+k*m}, 7)
 				end
-			else
-				add_head_lavashroom({x=pos.x+k, y=pos.y+height+2, z=pos.z+l}, 7)
 			end
+			minetest.env:add_node({x=pos.x+i, y=pos.y+height+1, z=pos.z+m}, {name=brown})
+			minetest.env:add_node({x=pos.x+m*2, y=pos.y+height+1, z=pos.z+o}, {name=brown})
 		end
-	end
 
-	for l = -2, 2, 4 do
-		for k = -1, 1, 1 do
-			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=brown})
-			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+k}, {name=brown})
-		end
-		for i = -2, 2, 4 do
-			minetest.env:add_node({x=pos.x+i, y=pos.y+height+1, z=pos.z+l}, {name=brown})
-		end
-	end
-
-	for k = -1, 1, 2 do
-		for l = -1, 1, 2 do
-			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=brown})
-		end
 		for l = -3+1, 3, 1 do
-			add_head_lavashroom({x=pos.x+3*k, y=pos.y+height+5, z=pos.z-l*k}, 5)
-			add_head_lavashroom({x=pos.x+l*k, y=pos.y+height+5, z=pos.z+3*k}, 5)
+			add_head_lavashroom({x=pos.x+3*i, y=pos.y+height+5, z=pos.z-l*i}, 5)
+			add_head_lavashroom({x=pos.x+l*i, y=pos.y+height+5, z=pos.z+3*i}, 5)
 		end
-	end
 
---	add_top_lavashroom(pos,height+3,6,4)
---	add_top_lavashroom(pos,height+4,6,4)
---	round edges:
-	for j = 0, 1, 1 do
-		for k = -4, 4, 8 do
+		for j = 0, 1, 1 do
 			for l = -3, 3, 1 do
-				add_head_lavashroom({x=pos.x+k, y=pos.y+height+3+j, z=pos.z+l}, 6)
-				add_head_lavashroom({x=pos.x+l, y=pos.y+height+3+j, z=pos.z+k}, 6)
+				add_head_lavashroom({x=pos.x+i*4, y=pos.y+height+3+j, z=pos.z+l}, 6)
+				add_head_lavashroom({x=pos.x+l, y=pos.y+height+3+j, z=pos.z+i*4}, 6)
 			end
 		end
+
 	end
 
 	for k = -2, 2, 1 do
@@ -156,6 +145,7 @@ end
 
 function riesenpilz_glowshroom(pos)
 	local stem = "riesenpilz:stem_blue"
+	local head = "riesenpilz:head_blue"
 	local height = 2+math.random(MAX_SIZE)
 	local br = 2
 
@@ -163,21 +153,21 @@ function riesenpilz_glowshroom(pos)
 		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name=stem})
 	end
 
-	for l = 1, height, 1 do
+	for i = -1, 1, 2 do
 
-		local head = "riesenpilz:head_blue"
-		if l == 1 then
-			head = "riesenpilz:head_blue_bright"
-		end
-
-		for i = -br, br, 2*br do
-			for k = -br, br, 2*br do
-				minetest.env:add_node({x=pos.x+i, y=pos.y+l, z=pos.z+k}, {name=head})
+		for k = -br, br, 2*br do
+			for l = 2, height, 1 do
+				minetest.env:add_node({x=pos.x+i*br, y=pos.y+l, z=pos.z+k}, {name=head})
 			end
+			minetest.env:add_node({x=pos.x+i*br, y=pos.y+1, z=pos.z+k}, {name="riesenpilz:head_blue_bright"})
 		end
-	end
 
-	local head = "riesenpilz:head_blue"
+		for l = -br+1, br, 1 do
+			minetest.env:add_node({x=pos.x+br*i, y=pos.y+height, z=pos.z-l*i}, {name=head})
+			minetest.env:add_node({x=pos.x+l*i, y=pos.y+height, z=pos.z+br*i}, {name=head})
+		end
+
+	end
 
 	for l = 0, br, 1 do
 		for i = -br+l, br-l, 1 do
@@ -187,14 +177,6 @@ function riesenpilz_glowshroom(pos)
 		end
 	end
 
-	local a = br
-	local h = height
-	for k = -1, 1, 2 do
-		for l = -a+1, a, 1 do
-			minetest.env:add_node({x=pos.x+a*k, y=pos.y+h, z=pos.z-l*k}, {name=head})
-			minetest.env:add_node({x=pos.x+l*k, y=pos.y+h, z=pos.z+a*k}, {name=head})
-		end
-	end
 end
 
 
@@ -282,6 +264,7 @@ minetest.register_node("riesenpilz:"..name, {
 	tile_images = {"riesenpilz_"..name.."_top.png", "riesenpilz_"..name.."_bottom.png", "riesenpilz_"..name.."_side.png"},
 	inventory_image = "riesenpilz_"..name.."_side.png",
 	walkable = false,
+	buildable_to = true,
 	drawtype = "nodebox",
 	paramtype = "light",
 	groups = {snappy=3,flammable=2,attached_node=1},
