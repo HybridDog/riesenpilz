@@ -226,7 +226,6 @@ minetest.register_node(":default:apple", {
 	visual_scale = 1.0,
 	tiles = {"3apple_apple_top.png","3apple_apple_bottom.png","3apple_apple.png"},
 	inventory_image = "default_apple.png",
-	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
