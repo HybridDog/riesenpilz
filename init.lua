@@ -1,135 +1,193 @@
 ---------------------------------------------------riesenpilz 12.12--------------------------------------------------
---Textures (edited with gimp) from gamiano.de and minecraft
+--Textures (edited with gimp) from gamiano.de
 
 local MAX_SIZE = 3
 
 
 
+
 --Growing Functions
 
-
 function riesenpilz_hybridpilz(pos)
+
+	local t1 = os.clock()
+	local manip = minetest.get_voxel_manip()
+	local vwidth = MAX_SIZE + 1
+	local vheight = vwidth + 1
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
+		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+
+	local nodes = manip:get_data()
+
 	local breite = math.random(MAX_SIZE)
 	local br = breite+1
 	local height = breite+2
-	local head = "riesenpilz:head_red"
 
 	for i = 0, height, 1 do
-		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="riesenpilz:stem"})
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem
 	end
 
 	for l = -br+1, br, 1 do
 		for k = -1, 1, 2 do
-			minetest.env:add_node({x=pos.x+br*k, y=pos.y+height, z=pos.z-l*k}, {name=head})
-			minetest.env:add_node({x=pos.x+l*k, y=pos.y+height, z=pos.z+br*k}, {name=head})
+			nodes[area:index(pos.x+br*k, pos.y+height, pos.z-l*k)] = riesenpilz_c_head_red
+			nodes[area:index(pos.x+l*k, pos.y+height, pos.z+br*k)] = riesenpilz_c_head_red
 		end
 	end
 
 	for k = -breite, breite, 1 do
 		for l = -breite, breite, 1 do
-			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+k}, {name=head})
-			minetest.env:add_node({x=pos.x+l, y=pos.y+height,	z=pos.z+k}, {name="riesenpilz:lamellas"})
+			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+k)] = riesenpilz_c_head_red
+			nodes[area:index(pos.x+l, pos.y+height, pos.z+k)] = riesenpilz_c_lamellas
 		end
 	end
+
+	manip:set_data(nodes)
+	manip:write_to_map()
+	print(string.format("[riesenpilz] a red mushroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
+	manip:update_map()
 end
 
 
 function riesenpilz_brauner_minecraftpilz(pos)
-	local head = "riesenpilz:head_brown"
+
+	local t1 = os.clock()
+	local manip = minetest.get_voxel_manip()
+	local vwidth = MAX_SIZE + 1
+	local vheight = vwidth + 1
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
+		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+
+	local nodes = manip:get_data()
+
 	local random = math.random(MAX_SIZE-1)
 	local br	 = random+1
 	local breite = br+1
 	local height = br+2
 
 	for i = 0, height, 1 do
-		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="riesenpilz:stem"})
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem
 	end
 
 	for l = -br, br, 1 do
 		for k = -breite, breite, breite*2 do
-			minetest.env:add_node({x=pos.x+k, y=pos.y+height+1, z=pos.z+l}, {name=head})
-			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+k}, {name=head})
+			nodes[area:index(pos.x+k, pos.y+height+1, pos.z+l)] = riesenpilz_c_head_brown
+			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+k)] = riesenpilz_c_head_brown
 		end
 		for k = -br, br, 1 do
-			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+k}, {name=head})
+			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+k)] = riesenpilz_c_head_brown
 		end
 	end
+
+	manip:set_data(nodes)
+	manip:write_to_map()
+	print(string.format("[riesenpilz] a brown mushroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
+	manip:update_map()
 end
 
 
 function riesenpilz_minecraft_fliegenpilz(pos)
+
+	local t1 = os.clock()
+	local manip = minetest.get_voxel_manip()
+	local vwidth = 1
+	local vheight = 4
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
+		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	local nodes = manip:get_data()
+
 	local height = 3
+	local tab = {}
+	local num = 1
 
 	for i = 0, height, 1 do
-		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="riesenpilz:stem"})
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem
 	end
 
 	for j = -1, 1, 1 do
 		for k = -1, 1, 1 do
-			minetest.env:add_node({x=pos.x+j, y=pos.y+height+1, z=pos.z+k}, {name="riesenpilz:head_red"})
+			nodes[area:index(pos.x+j, pos.y+height+1, pos.z+k)] = riesenpilz_c_head_red
 		end
 		for l = 1, height, 1 do
-			minetest.env:set_node({x=pos.x+j, y=pos.y+l, z=pos.z+2}, {name="riesenpilz:head_red_side", param2=0})
-			minetest.env:set_node({x=pos.x+j, y=pos.y+l, z=pos.z-2}, {name="riesenpilz:head_red_side", param2=2})
-			minetest.env:set_node({x=pos.x+2, y=pos.y+l, z=pos.z+j}, {name="riesenpilz:head_red_side", param2=1})
-			minetest.env:set_node({x=pos.x-2, y=pos.y+l, z=pos.z+j}, {name="riesenpilz:head_red_side", param2=3})
+			tab[num] = {{x=pos.x+j, y=pos.y+l, z=pos.z+2}, {name="riesenpilz:head_red_side", param2=0}}
+			tab[num+1] = {{x=pos.x+j, y=pos.y+l, z=pos.z-2}, {name="riesenpilz:head_red_side", param2=2}}
+			tab[num+2] = {{x=pos.x+2, y=pos.y+l, z=pos.z+j}, {name="riesenpilz:head_red_side", param2=1}}
+			tab[num+3] = {{x=pos.x-2, y=pos.y+l, z=pos.z+j}, {name="riesenpilz:head_red_side", param2=3}}
+			num = num+4
 		end
 	end
+
+	manip:set_data(nodes)
+	manip:write_to_map()
+	manip:update_map()
+
+	for _,v in ipairs(tab) do
+		minetest.env:set_node(v[1], v[2])
+	end
+	print(string.format("[riesenpilz] a fly agaric grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
 end
 
 
-local function add_head_lavashroom(pos, ran)
-	local head = "riesenpilz:head_orange"
+local function ran_node(a, b, ran)
 	if math.random(ran) == 1 then
-		head = "riesenpilz:head_yellow"
-	else
-		head = "riesenpilz:head_orange"
+		return a
 	end
-	minetest.env:add_node(pos, {name=head})
+	return b
 end
 
 function riesenpilz_lavashroom(pos)
-	local stem = "riesenpilz:stem_brown"
-	local brown = "riesenpilz:head_brown_full"
+
+	local t1 = os.clock()
+	local manip = minetest.get_voxel_manip()
+	local vwidth = 4
+	local vheight = MAX_SIZE+7
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
+		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+
+	local nodes = manip:get_data()
+
 	local height = 3+math.random(MAX_SIZE-2)
-	minetest.env:remove_node(pos)	
+	nodes[area:index(pos.x, pos.y, pos.z)] = riesenpilz_c_air
 
 	for i = -1, 1, 2 do
 		local o = 2*i
 
 		for n = 0, height, 1 do
-			minetest.env:add_node({x=pos.x+i, y=pos.y+n, z=pos.z}, {name=stem})
-			minetest.env:add_node({x=pos.x, y=pos.y+n, z=pos.z+i}, {name=stem})
+			nodes[area:index(pos.x+i, pos.y+n, pos.z)] = riesenpilz_c_stem_brown
+			nodes[area:index(pos.x, pos.y+n, pos.z+i)] = riesenpilz_c_stem_brown
 		end
 
 		for l = -1, 1, 1 do
 			for k = 2, 3, 1 do
-				minetest.env:add_node({x=pos.x+k*i, y=pos.y+height+2, z=pos.z+l}, {name=brown})
-				minetest.env:add_node({x=pos.x+l, y=pos.y+height+2, z=pos.z+k*i}, {name=brown})
+				nodes[area:index(pos.x+k*i, pos.y+height+2, pos.z+l)] = riesenpilz_c_head_brown_full
+				nodes[area:index(pos.x+l, pos.y+height+2, pos.z+k*i)] = riesenpilz_c_head_brown_full
 			end
-			minetest.env:add_node({x=pos.x+l, y=pos.y+height+1, z=pos.z+o}, {name=brown})
-			minetest.env:add_node({x=pos.x+o, y=pos.y+height+1, z=pos.z+l}, {name=brown})
+			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+o)] = riesenpilz_c_head_brown_full
+			nodes[area:index(pos.x+o, pos.y+height+1, pos.z+l)] = riesenpilz_c_head_brown_full
 		end
 
 		for m = -1, 1, 2 do
 			for k = 2, 3, 1 do
 				for j = 2, 3, 1 do
-					add_head_lavashroom({x=pos.x+j*i, y=pos.y+height+2, z=pos.z+k*m}, 7)
+					nodes[area:index(pos.x+j*i, pos.y+height+2, pos.z+k*m)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 7)
 				end
 			end
-			minetest.env:add_node({x=pos.x+i, y=pos.y+height+1, z=pos.z+m}, {name=brown})
-			minetest.env:add_node({x=pos.x+m*2, y=pos.y+height+1, z=pos.z+o}, {name=brown})
+			nodes[area:index(pos.x+i, pos.y+height+1, pos.z+m)] = riesenpilz_c_head_brown_full
+			nodes[area:index(pos.x+m*2, pos.y+height+1, pos.z+o)] = riesenpilz_c_head_brown_full
 		end
 
 		for l = -3+1, 3, 1 do
-			add_head_lavashroom({x=pos.x+3*i, y=pos.y+height+5, z=pos.z-l*i}, 5)
-			add_head_lavashroom({x=pos.x+l*i, y=pos.y+height+5, z=pos.z+3*i}, 5)
+			nodes[area:index(pos.x+3*i, pos.y+height+5, pos.z-l*i)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 5)
+			nodes[area:index(pos.x+l*i, pos.y+height+5, pos.z+3*i)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 5)
 		end
 
 		for j = 0, 1, 1 do
 			for l = -3, 3, 1 do
-				add_head_lavashroom({x=pos.x+i*4, y=pos.y+height+3+j, z=pos.z+l}, 6)
-				add_head_lavashroom({x=pos.x+l, y=pos.y+height+3+j, z=pos.z+i*4}, 6)
+				nodes[area:index(pos.x+i*4, pos.y+height+3+j, pos.z+l)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 6)
+				nodes[area:index(pos.x+l, pos.y+height+3+j, pos.z+i*4)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 6)
 			end
 		end
 
@@ -137,34 +195,48 @@ function riesenpilz_lavashroom(pos)
 
 	for k = -2, 2, 1 do
 		for l = -2, 2, 1 do
-			add_head_lavashroom({x=pos.x+k, y=pos.y+height+6, z=pos.z+l}, 4)
+			nodes[area:index(pos.x+k, pos.y+height+6, pos.z+l)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 4)
 		end
 	end
+
+	manip:set_data(nodes)
+	manip:write_to_map()
+	print(string.format("[riesenpilz] a lavashroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
+	manip:update_map()
 end
 
 
 function riesenpilz_glowshroom(pos)
-	local stem = "riesenpilz:stem_blue"
-	local head = "riesenpilz:head_blue"
+
+	local t1 = os.clock()
+	local manip = minetest.get_voxel_manip()
+	local vwidth = 2
+	local vheight = 5+MAX_SIZE
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
+		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+
+	local nodes = manip:get_data()
+
 	local height = 2+math.random(MAX_SIZE)
 	local br = 2
 
 	for i = 0, height, 1 do
-		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name=stem})
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem_blue
 	end
 
 	for i = -1, 1, 2 do
 
 		for k = -br, br, 2*br do
 			for l = 2, height, 1 do
-				minetest.env:add_node({x=pos.x+i*br, y=pos.y+l, z=pos.z+k}, {name=head})
+				nodes[area:index(pos.x+i*br, pos.y+l, pos.z+k)] = riesenpilz_c_head_blue
 			end
-			minetest.env:add_node({x=pos.x+i*br, y=pos.y+1, z=pos.z+k}, {name="riesenpilz:head_blue_bright"})
+			nodes[area:index(pos.x+i*br, pos.y+1, pos.z+k)] = riesenpilz_c_head_blue_bright
 		end
 
 		for l = -br+1, br, 1 do
-			minetest.env:add_node({x=pos.x+br*i, y=pos.y+height, z=pos.z-l*i}, {name=head})
-			minetest.env:add_node({x=pos.x+l*i, y=pos.y+height, z=pos.z+br*i}, {name=head})
+			nodes[area:index(pos.x+i*br, pos.y+height, pos.z-l*i)] = riesenpilz_c_head_blue
+			nodes[area:index(pos.x+l*i, pos.y+height, pos.z+br*i)] = riesenpilz_c_head_blue
 		end
 
 	end
@@ -172,47 +244,66 @@ function riesenpilz_glowshroom(pos)
 	for l = 0, br, 1 do
 		for i = -br+l, br-l, 1 do
 			for k = -br+l, br-l, 1 do
-				minetest.env:add_node({x=pos.x+i, y=pos.y+height+1+l, z=pos.z+k}, {name=head})
+				nodes[area:index(pos.x+i, pos.y+height+1+l, pos.z+k)] = riesenpilz_c_head_blue
 			end
 		end
 	end
 
+	manip:set_data(nodes)
+	manip:write_to_map()
+	print(string.format("[riesenpilz] a glowshroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
+	manip:update_map()
 end
 
 
 function riesenpilz_apple(pos)
+
+	local t1 = os.clock()
+	local manip = minetest.get_voxel_manip()
+	local vwidth = 5
+	local vheight = 14
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
+		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+
+	local nodes = manip:get_data()
+
 	local size = 5
 	local a = size*2
 	local b = size-1
-	local red = "default:copperblock"
-	local brown = "default:desert_stone"
+
 	for l = -b, b, 1 do
 		for j = 1, a-1, 1 do
 			for k = -size, size, a do
-				minetest.env:add_node({x=pos.x+k, y=pos.y+j, z=pos.z+l}, {name=red})
-				minetest.env:add_node({x=pos.x+l, y=pos.y+j, z=pos.z+k}, {name=red})
+				nodes[area:index(pos.x+k, pos.y+j, pos.z+l)] = riesenpilz_c_red
+				nodes[area:index(pos.x+l, pos.y+j, pos.z+k)] = riesenpilz_c_red
 			end
 		end
 		for i = -b, b, 1 do
-			minetest.env:add_node({x=pos.x+i, y=pos.y, z=pos.z+l}, {name=red})
-			minetest.env:add_node({x=pos.x+i, y=pos.y+a, z=pos.z+l}, {name=red})
+			nodes[area:index(pos.x+i, pos.y, pos.z+l)] = riesenpilz_c_red
+			nodes[area:index(pos.x+i, pos.y+a, pos.z+l)] = riesenpilz_c_red
 		end
 	end
 
 	for i = a+1, a+b, 1 do
-		minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="default:tree"})
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_tree
 	end
 
 	local c = pos.y+1
 	for i = -3,1,1 do
-		minetest.env:add_node({x=pos.x+i, y=c, z=pos.z+1}, {name=brown})
+		nodes[area:index(pos.x+i, c, pos.z+1)] = riesenpilz_c_brown
 	end
 	for i = 0,1,1 do
-		minetest.env:add_node({x=pos.x+1+i, y=c, z=pos.z-1-i}, {name=brown})
-		minetest.env:add_node({x=pos.x+2+i, y=c, z=pos.z-1-i}, {name=brown})
+		nodes[area:index(pos.x+i+1, c, pos.z-1-i)] = riesenpilz_c_brown
+		nodes[area:index(pos.x+i+2, c, pos.z-1-i)] = riesenpilz_c_brown
 	end
-	minetest.env:add_node({x=pos.x+1, y=c, z=pos.z}, {name=brown})
-	minetest.env:add_node({x=pos.x-3, y=c+1, z=pos.z+1}, {name=brown})
+	nodes[area:index(pos.x+1, c, pos.z)] = riesenpilz_c_brown
+	nodes[area:index(pos.x-3, c+1, pos.z+1)] = riesenpilz_c_brown
+
+	manip:set_data(nodes)
+	manip:write_to_map()
+	print(string.format("[riesenpilz] an apple grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
+	manip:update_map()
 end
 
 
@@ -260,7 +351,7 @@ minetest.register_node(":default:apple", {
 local function pilz(name, desc, box)
 minetest.register_node("riesenpilz:"..name, {
 	description = desc,
-	tile_images = {"riesenpilz_"..name.."_top.png", "riesenpilz_"..name.."_bottom.png", "riesenpilz_"..name.."_side.png"},
+	tiles = {"riesenpilz_"..name.."_top.png", "riesenpilz_"..name.."_bottom.png", "riesenpilz_"..name.."_side.png"},
 	inventory_image = "riesenpilz_"..name.."_side.png",
 	walkable = false,
 	buildable_to = true,
@@ -325,11 +416,25 @@ local BOX_GLOWSHROOM = {
 	},
 }
 
+local BOX_NETHER_SHROOM = {
+	type = "fixed",
+	fixed = {
+		{-1/16, -8/16, -1/16, 1/16, -2/16, 1/16},
+		{-2/16, -6/16, -2/16, 2/16, -5/16, 2/16},
+		{-3/16, -2/16, -3/16, 3/16,     0, 3/16},
+		{-4/16, -1/16, -4/16, 4/16,  1/16,-2/16},
+		{-4/16, -1/16,  2/16, 4/16,  1/16, 4/16},
+		{-4/16, -1/16, -2/16,-2/16,  1/16, 2/16},
+		{ 2/16, -1/16, -2/16, 4/16,  1/16, 2/16},
+	},
+}
+
 pilz("brown", "Brown Mushroom", BOX_BROWN)
 pilz("red", "Red Mushroom", BOX_RED)
 pilz("fly_agaric", "Fly Agaric", BOX_FLY_AGARIC)
 pilz("lavashroom", "Lavashroom", BOX_LAVASHROOM)
 pilz("glowshroom", "Glowshroom", BOX_GLOWSHROOM)
+pilz("nether_shroom", "Nether Mushroom", BOX_NETHER_SHROOM)
 
 
 
@@ -339,7 +444,7 @@ pilz("glowshroom", "Glowshroom", BOX_GLOWSHROOM)
 local function pilznode(name, desc, textures, sapling)
 minetest.register_node("riesenpilz:"..name, {
 	description = desc,
-	tile_images = textures,
+	tiles = textures,
 	groups = {oddly_breakable_by_hand=3},
 	drop = {max_items = 1,
 		items = {{items = {"riesenpilz:"..sapling},rarity = 20,},
@@ -364,7 +469,7 @@ pilznode("stem_blue", "Giant Mushroom Stem Blue",
 
 minetest.register_node("riesenpilz:head_red_side", {
 	description = "Giant Mushroom Head Side",
-	tile_images = {"riesenpilz_head.png",	"riesenpilz_lamellas.png",	"riesenpilz_head.png",
+	tiles = {"riesenpilz_head.png",	"riesenpilz_lamellas.png",	"riesenpilz_head.png",
 					"riesenpilz_head.png",	"riesenpilz_head.png",	"riesenpilz_lamellas.png"},
 	paramtype2 = "facedir",
 	groups = {oddly_breakable_by_hand=3},
@@ -375,11 +480,34 @@ minetest.register_node("riesenpilz:head_red_side", {
 
 minetest.register_node("riesenpilz:ground", {
 	description = "Grass?",
-	tile_images = {"riesenpilz_ground_top.png","default_dirt.png","default_dirt.png^riesenpilz_ground_side.png"},
+	tiles = {"riesenpilz_ground_top.png","default_dirt.png","default_dirt.png^riesenpilz_ground_side.png"},
 	groups = {crumbly=3},
 	sounds = default.node_sound_dirt_defaults(),
 	drop = 'default:dirt'
 })
+
+
+riesenpilz_c_air = minetest.get_content_id("air")
+
+riesenpilz_c_stem = minetest.get_content_id("riesenpilz:stem")
+riesenpilz_c_head_red = minetest.get_content_id("riesenpilz:head_red")
+riesenpilz_c_lamellas = minetest.get_content_id("riesenpilz:lamellas")
+
+riesenpilz_c_head_brown = minetest.get_content_id("riesenpilz:head_brown")
+
+riesenpilz_c_stem_brown = minetest.get_content_id("riesenpilz:stem_brown")
+riesenpilz_c_head_brown_full = minetest.get_content_id("riesenpilz:head_brown_full")
+riesenpilz_c_head_orange = minetest.get_content_id("riesenpilz:head_orange")
+riesenpilz_c_head_yellow = minetest.get_content_id("riesenpilz:head_yellow")
+
+riesenpilz_c_stem_blue = minetest.get_content_id("riesenpilz:stem_blue")
+riesenpilz_c_head_blue = minetest.get_content_id("riesenpilz:head_blue")
+riesenpilz_c_head_blue_bright = minetest.get_content_id("riesenpilz:head_blue_bright")
+
+riesenpilz_c_red = minetest.get_content_id("default:copperblock")
+riesenpilz_c_brown = minetest.get_content_id("default:desert_stone")
+riesenpilz_c_tree = minetest.get_content_id("default:tree")
+
 
 
 
@@ -393,17 +521,18 @@ minetest.register_tool("riesenpilz:growingtool", {
 
 minetest.register_on_punchnode(function(pos, node, puncher)
 	if puncher:get_wielded_item():get_name() == "riesenpilz:growingtool" then
-		if minetest.env:get_node(pos).name == "riesenpilz:red" then
+		local name = node.name
+		if name == "riesenpilz:red" then
 			riesenpilz_hybridpilz(pos)
-		elseif minetest.env:get_node(pos).name == "riesenpilz:fly_agaric" then
+		elseif name == "riesenpilz:fly_agaric" then
 			riesenpilz_minecraft_fliegenpilz(pos)
-		elseif minetest.env:get_node(pos).name == "riesenpilz:brown" then
+		elseif name == "riesenpilz:brown" then
 			riesenpilz_brauner_minecraftpilz(pos)
-		elseif minetest.env:get_node(pos).name == "riesenpilz:lavashroom" then
+		elseif name == "riesenpilz:lavashroom" then
 			riesenpilz_lavashroom(pos)
-		elseif minetest.env:get_node(pos).name == "riesenpilz:glowshroom" then
+		elseif name == "riesenpilz:glowshroom" then
 			riesenpilz_glowshroom(pos)
-		elseif minetest.env:get_node(pos).name == "default:apple" then
+		elseif name == "default:apple" then
 			riesenpilz_apple(pos)
 		end
 	end
