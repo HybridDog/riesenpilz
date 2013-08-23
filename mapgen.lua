@@ -1,172 +1,241 @@
---[[
-function riesenpilz_circle(nam, pos, radius, rand, seed)
-	local ra = seed
-	for i = -radius, radius, 1 do
-		for j = -radius, radius, 1 do
-			if math.floor(	math.sqrt(i^2+j^2)	+0.5) == radius then
-				random = PseudoRandom(ra)
-				p={x=pos.x+i, y=pos.y, z=pos.z+j}
-				if minetest.env:get_node(p).name == "air"
-				and random:next(1,rand) == 1
-				and minetest.env:get_node({x=pos.x+i, y=pos.y-1, z=pos.z+j}).name ~= "air" then
-					minetest.env:add_node(p, {name=nam})
-				end
-				ra = ra+1
-			end
-		end
-	end
-end
+local c_air = minetest.get_content_id("air")
+local c_stone = minetest.get_content_id("default:stone")
+local c_gr = minetest.get_content_id("default:dirt_with_grass")
+local c_dirt = minetest.get_content_id("default:dirt")
+local c_sand = minetest.get_content_id("default:sand")
+local c_desert_sand = minetest.get_content_id("default:desert_sand")
 
-						elseif pr:next(1,80) == 1 then
-							riesenpilz_circle("riesenpilz:brown", boden, pr:next(2,3), 3, seed)
-						elseif pr:next(1,90) == 1 then
-							riesenpilz_circle("riesenpilz:red", boden, pr:next(3,4), 3, seed)
-						elseif pr:next(1,100) == 1 then
-							riesenpilz_circle("riesenpilz:fly_agaric", boden, 3, 3, seed)
-						elseif pr:next(1,4000) == 1 then
-							riesenpilz_circle("riesenpilz:lavashroom", boden, pr:next(4,5), 3, seed)
-						elseif pr:next(1,5000) == 1 then
-							riesenpilz_circle("riesenpilz:glowshroom", boden, 2, 3, seed)
-]]
-function riesenpilz_circle(nam, pos, radius, chance)
-	for i = -radius, radius, 1 do
-		for j = -radius, radius, 1 do
-			if math.floor(	math.sqrt(i^2+j^2)	+0.5) == radius
-			and minetest.env:get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name == "air"
-			and math.random(1,chance) == 1
-			and minetest.env:get_node({x=pos.x+i, y=pos.y-1, z=pos.z+j}).name == "riesenpilz:ground" then
-				minetest.env:add_node({x=pos.x+i, y=pos.y, z=pos.z+j}, {name=nam})
-			end
-		end
-	end
-end
+local c_tree = minetest.get_content_id("default:tree")
+local c_leaves = minetest.get_content_id("default:leaves")
+local c_apple = minetest.get_content_id("default:apple")
+local c_cactus = minetest.get_content_id("default:cactus")
+local c_papyrus = minetest.get_content_id("default:papyrus")
+local c_dry_shrub = minetest.get_content_id("default:dry_shrub")
 
-local function find_ground(pos, nodes)
-	for _, evground in ipairs(nodes) do
-		if minetest.env:get_node(pos).name == evground then
+local c_ground = minetest.get_content_id("riesenpilz:ground")
+local c_riesenpilz_brown = minetest.get_content_id("riesenpilz:brown")
+local c_riesenpilz_red = minetest.get_content_id("riesenpilz:red")
+local c_riesenpilz_fly_agaric = minetest.get_content_id("riesenpilz:fly_agaric")
+local c_riesenpilz_lavashroom = minetest.get_content_id("riesenpilz:lavashroom")
+local c_riesenpilz_glowshroom = minetest.get_content_id("riesenpilz:glowshroom")
+
+
+local function find_grond(a,list)
+	for _,nam in ipairs(list) do			
+		if a == nam then
 			return true
 		end
 	end
 	return false
 end
 
-local GROUND	=	{"default:dirt_with_grass","default:dirt","default:sand","default:desert_sand"}
-USUAL_STUFF =	{"default:leaves","default:apple","default:tree","default:cactus","default:papyrus"}
-minetest.register_on_generated(function(minp, maxp, seed)
-	if maxp.y >= -10 then
-		local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
-		local env = minetest.env	--Should make things a bit faster.
-		local perlin1 = env:get_perlin(11,3, 0.5, 200)	--Get map specific perlin
 
-		--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
-		and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
-		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
-		if not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
-		and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > 0.53 )--top middle
-		and not (perlin1:get2d({x=x1, y=z1}) > 0.53) 						--bottom right
-		and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > 0.53) 			--right middle
-		and not (perlin1:get2d({x=x0, y=z1}) > 0.53)  						--bottom left
-		and not (perlin1:get2d({x=x1, y=z0}) > 0.53)						--top right
-		and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > 0.53) 			--left middle
-		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) 			--middle
-		and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > 0.53) then		--bottom middle
-			print("abortsumpf")
-			return
+function riesenpilz_circle(nam, pos, radius, chance)
+	for i = -radius, radius, 1 do
+		for j = -radius, radius, 1 do
+			if math.floor(	math.sqrt(i^2+j^2)	+0.5) == radius
+			and data[area:index(pos.x+i, pos.y, pos.z+j)] == c_air
+			and pr:next(1,chance) == 1
+			and data[area:index(pos.x+i, pos.y-1, pos.z+j)] == c_ground then
+				data[area:index(pos.x+i, pos.y, pos.z+j)] = nam
+			end
 		end
-		local divs = (maxp.x-minp.x);
-		local pr = PseudoRandom(seed+68)
+	end
+end
 
-		--remove usual stuff
+local function say_info(info)
+	local info = "[riesenpilz] "..info
+	print(info)
+	minetest.chat_send_all(info)
+end
+
+
+local GROUND	=	{c_gr, c_sand, c_dirt, c_desert_sand}
+--local USUAL_STUFF =	{"default:leaves","default:apple","default:tree","default:cactus","default:papyrus"}
+minetest.register_on_generated(function(minp, maxp, seed)
+	if maxp.y <= 0
+	or minp.y >= 150 then --avoid generation in the sky
+		return
+	end
+	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
+	local env = minetest.env	--Should make things a bit faster.
+	local perlin1 = env:get_perlin(51,3, 0.5, 200)	--Get map specific perlin
+
+	--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
+	and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
+	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
+	if not riesenpilz.always_generate
+	and not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
+	and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > 0.53 )--top middle
+	and not (perlin1:get2d({x=x1, y=z1}) > 0.53) 						--bottom right
+	and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > 0.53) 			--right middle
+	and not (perlin1:get2d({x=x0, y=z1}) > 0.53)  						--bottom left
+	and not (perlin1:get2d({x=x1, y=z0}) > 0.53)						--top right
+	and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > 0.53) 			--left middle
+	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) 			--middle
+	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > 0.53) then		--bottom middle
+		print("[riesenpilz] abort")
+		return
+	end
+
+	if riesenpilz.info then
+		say_info("tries to generate at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]")
+		t1 = os.clock()
+	end
+
+	local divs = (maxp.x-minp.x);
+	local num = 1
+	local tab = {}
+	pr = PseudoRandom(seed+68)
+
+	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
+	data = vm:get_data()
+	area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
+
+	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
+		local d_p_pos = data[p_pos]
+		for _,nam in ipairs({c_tree, c_leaves, c_apple}) do			
+			if d_p_pos == nam then
+				data[p_pos] = c_air
+				break
+			end
+		end
+	end
+		--[[remove usual stuff
 		local trees = env:find_nodes_in_area(minp, maxp, USUAL_STUFF)
 		for i,v in pairs(trees) do
 			env:remove_node(v)
-		end
+		end]]
 
-		--Information:
-		local geninfo = "-#- giant mushrooms generate: x=["..minp.x.."; "..maxp.x.."] z=["..minp.z.."; "..maxp.z.."]"
-		print(geninfo)
-		minetest.chat_send_all(geninfo)
 
-		local smooth = riesenpilz.smooth
+	local smooth = riesenpilz.smooth
 
-		for j=0,divs do
-			for i=0,divs do
-				local x,z = x0+i,z0+j
+	for j=0,divs do
+		for i=0,divs do
+			local x,z = x0+i,z0+j
 
-				--Check if we are in a "riesenpilz biome"
-				local in_biome = false
-				local test = perlin1:get2d({x=x, y=z})
-				--smooth mapgen
-				if smooth and (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
-					in_biome = true
-				elseif (not smooth) and test > 0.53 then
-					in_biome = true
-				end
+			--Check if we are in a "riesenpilz biome"
+			local in_biome = false
+			local test = perlin1:get2d({x=x, y=z})
+			--smooth mapgen
+			if riesenpilz.always_generate then
+				in_biome = true
+			elseif smooth and (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
+				in_biome = true
+			elseif (not smooth) and test > 0.53 then
+				in_biome = true
+			end
 
-				if in_biome then
+			if in_biome then
 
-					local ground_y = nil --Definition des Bodens:
-					for y=maxp.y,0,-1 do
-						if find_ground({x=x,y=y,z=z}, GROUND) then
-							ground_y = y
+				for b = minp.y,maxp.y,1 do	--remove usual stuff
+					local p_pos = area:index(x, b, z)
+					local d_p_pos = data[p_pos]
+					for _,nam in ipairs({c_cactus, c_papyrus}) do			
+						if d_p_pos == nam then
+							data[p_pos] = c_air
 							break
 						end
 					end
-					if ground_y then
-						env:add_node({x=x,y=ground_y,z=z}, {name="riesenpilz:ground"})
-						for i = -1,-5,-1 do
-							local pos = {x=x,y=ground_y+i,z=z}
-							if env:get_node(pos).name == "default:desert_sand" then
-								env:add_node(pos, {name="default:dirt"})
-							else
-								break
-							end
+				end
+
+				local ground_y = nil --Definition des Bodens:
+--				for y=maxp.y,0,-1 do
+				for y=maxp.y,1,-1 do
+					if find_grond(data[area:index(x, y, z)], GROUND) then
+						ground_y = y
+						break
+					end
+				end
+				if ground_y then
+					local p_ground = area:index(x, ground_y, z)
+					local p_boden = area:index(x, ground_y+1, z)
+					local d_p_ground = data[p_ground]
+					local d_p_boden = data[p_boden]
+
+					data[p_ground] = c_ground
+					for i = -1,-5,-1 do
+						local p_pos = area:index(x, ground_y+i, z)
+						local d_p_pos = data[p_pos]
+						if d_p_pos == c_desert_sand then
+							data[p_pos] = c_dirt
+						else
+							break
 						end
-						local boden = {x=x,y=ground_y+1,z=z}
-						if pr:next(1,15) == 1 then
-							env:add_node(boden, {name="default:dry_shrub"})
-						elseif pr:next(1,80) == 1 then
-							riesenpilz_circle("riesenpilz:brown", boden, pr:next(3,4), 3)
-						elseif pr:next(1,90) == 1 then
-							riesenpilz_circle("riesenpilz:red", boden, pr:next(4,5), 3)
-						elseif pr:next(1,100) == 1 then
-							riesenpilz_circle("riesenpilz:fly_agaric", boden, 4, 3)
-						elseif pr:next(1,4000) == 1 then
-							riesenpilz_circle("riesenpilz:lavashroom", boden, pr:next(5,6), 3)
-						elseif pr:next(1,5000) == 1 then
-							riesenpilz_circle("riesenpilz:glowshroom", boden, 3, 3)
-						--[[elseif pr:next(1,80) == 1 then
-							env:add_node(boden, {name="riesenpilz:brown"})
-						elseif pr:next(1,90) == 1 then
-							env:add_node(boden, {name="riesenpilz:red"})
-						elseif pr:next(1,100) == 1 then
-							env:add_node(boden, {name="riesenpilz:fly_agaric"})
-						elseif pr:next(1,4000) == 1 then
-							env:add_node(boden, {name="riesenpilz:lavashroom"})
-						elseif pr:next(1,5000) == 1 then
-							env:add_node(boden, {name="riesenpilz:glowshroom"})]]
-						elseif pr:next(1,380) == 1 then
-							riesenpilz_hybridpilz(boden)
-						elseif pr:next(1,340) == 10 then
-							riesenpilz_brauner_minecraftpilz(boden)
-						elseif pr:next(1,390) == 20 then
-							riesenpilz_minecraft_fliegenpilz(boden)
-						elseif pr:next(1,6000) == 2 and pr:next(1,200) == 15 then
-							riesenpilz_lavashroom(boden)
-						end
+					end
+					local boden = {x=x,y=ground_y+1,z=z}
+					if pr:next(1,15) == 1 then
+						data[p_boden] = c_dry_shrub
+					elseif pr:next(1,80) == 1 then
+						riesenpilz_circle(c_riesenpilz_brown, boden, pr:next(3,4), 3)
+					elseif pr:next(1,90) == 1 then
+						riesenpilz_circle(c_riesenpilz_red, boden, pr:next(4,5), 3)
+					elseif pr:next(1,100) == 1 then
+						riesenpilz_circle(c_riesenpilz_fly_agaric, boden, 4, 3)
+					elseif pr:next(1,4000) == 1 then
+						riesenpilz_circle(c_riesenpilz_lavashroom, boden, pr:next(5,6), 3)
+					elseif pr:next(1,5000) == 1 then
+						riesenpilz_circle(c_riesenpilz_glowshroom, boden, 3, 3)
+					--[[elseif pr:next(1,80) == 1 then
+						env:add_node(boden, {name="riesenpilz:brown"})
+					elseif pr:next(1,90) == 1 then
+						env:add_node(boden, {name="riesenpilz:red"})
+					elseif pr:next(1,100) == 1 then
+						env:add_node(boden, {name="riesenpilz:fly_agaric"})
+					elseif pr:next(1,4000) == 1 then
+						env:add_node(boden, {name="riesenpilz:lavashroom"})
+					elseif pr:next(1,5000) == 1 then
+						env:add_node(boden, {name="riesenpilz:glowshroom"})]]
+					elseif pr:next(1,380) == 1 then
+						tab[num] = {1, boden}
+						num = num+1
+					elseif pr:next(1,340) == 10 then
+						tab[num] = {2, boden}
+						num = num+1
+					elseif pr:next(1,390) == 20 then
+						tab[num] = {3, boden}
+						num = num+1
+					elseif pr:next(1,6000) == 2 and pr:next(1,200) == 15 then
+						tab[num] = {4, boden}
+						num = num+1
 					end
 				end
 			end
 		end
 	end
-	if maxp.y < -10 then
+	vm:set_data(data)
+	--vm:set_lighting({day=0, night=0})
+	vm:calc_lighting()
+	vm:update_liquids()
+	vm:write_to_map()
+	if riesenpilz.info then
+		say_info(string.format("ground generated after: %.2fs", os.clock() - t1))
+		t1 = os.clock()
+	end
+	for _,v in ipairs(tab) do
+		local p = v[2]
+		if v[1] == 1 then
+			riesenpilz_hybridpilz(p)
+		elseif v[1] == 2 then
+			riesenpilz_brauner_minecraftpilz(p)
+		elseif v[1] == 3 then
+			riesenpilz_minecraft_fliegenpilz(p)
+		elseif v[1] == 4 then
+			riesenpilz_lavashroom(p)
+		end
+	end
+	if riesenpilz.info then
+		say_info(string.format("giant shrooms generated after: %.2fs", os.clock() - t1))
+	end
+end)
+--[[	if maxp.y < -10 then
 		local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
 		local env = minetest.env	--Should make things a bit faster.
 		local perlin1 = env:get_perlin(11,3, 0.5, 200)	--Get map specific perlin
 
-		--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
+		--[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
 		and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
-		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
+		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]
 		if not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
 		and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > 0.53 )--top middle
 		and not (perlin1:get2d({x=x1, y=z1}) > 0.53) 						--bottom right
@@ -200,4 +269,4 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 		end
 	end
-end)
+end)]]
