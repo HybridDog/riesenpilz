@@ -1,9 +1,4 @@
----------------------------------------------------riesenpilz 12.12--------------------------------------------------
---Textures (edited with gimp) from gamiano.de
-
 local MAX_SIZE = 3
-
-
 
 
 --Growing Functions
