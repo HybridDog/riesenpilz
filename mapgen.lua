@@ -8,6 +8,9 @@ local c_desert_sand = minetest.get_content_id("default:desert_sand")
 local c_tree = minetest.get_content_id("default:tree")
 local c_leaves = minetest.get_content_id("default:leaves")
 local c_apple = minetest.get_content_id("default:apple")
+local c_jungletree = minetest.get_content_id("default:jungletree")
+local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
+local c_junglegrass = minetest.get_content_id("default:junglegrass")
 local c_cactus = minetest.get_content_id("default:cactus")
 local c_papyrus = minetest.get_content_id("default:papyrus")
 local c_dry_shrub = minetest.get_content_id("default:dry_shrub")
@@ -18,6 +21,7 @@ local c_riesenpilz_red = minetest.get_content_id("riesenpilz:red")
 local c_riesenpilz_fly_agaric = minetest.get_content_id("riesenpilz:fly_agaric")
 local c_riesenpilz_lavashroom = minetest.get_content_id("riesenpilz:lavashroom")
 local c_riesenpilz_glowshroom = minetest.get_content_id("riesenpilz:glowshroom")
+local c_riesenpilz_parasol = minetest.get_content_id("riesenpilz:parasol")
 
 
 local function find_grond(a,list)
@@ -49,6 +53,14 @@ local function say_info(info)
 	minetest.chat_send_all(info)
 end
 
+local riesenpilz_rarity = riesenpilz.mapgen_rarity
+local riesenpilz_size = riesenpilz.mapgen_size
+
+local nosmooth_rarity = -(riesenpilz_rarity/50)+1
+local perlin_scale = riesenpilz_size*100/riesenpilz_rarity
+local smooth_rarity_full = nosmooth_rarity+perlin_scale/(20*riesenpilz_size)
+local smooth_rarity_ran = nosmooth_rarity-perlin_scale/(40*riesenpilz_size)
+local smooth_rarity_dif = (smooth_rarity_full-smooth_rarity_ran)*100-1
 
 local GROUND	=	{c_gr, c_sand, c_dirt, c_desert_sand}
 --local USUAL_STUFF =	{"default:leaves","default:apple","default:tree","default:cactus","default:papyrus"}
@@ -59,21 +71,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
 	local env = minetest.env	--Should make things a bit faster.
-	local perlin1 = env:get_perlin(51,3, 0.5, 200)	--Get map specific perlin
+	local perlin1 = env:get_perlin(51,3, 0.5, perlin_scale)	--Get map specific perlin
 
 	--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
 	and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
 	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
 	if not riesenpilz.always_generate
-	and not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
-	and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > 0.53 )--top middle
-	and not (perlin1:get2d({x=x1, y=z1}) > 0.53) 						--bottom right
-	and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > 0.53) 			--right middle
-	and not (perlin1:get2d({x=x0, y=z1}) > 0.53)  						--bottom left
-	and not (perlin1:get2d({x=x1, y=z0}) > 0.53)						--top right
-	and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > 0.53) 			--left middle
-	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) 			--middle
-	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > 0.53) then		--bottom middle
+	and not ( perlin1:get2d( {x=x0, y=z0} ) > nosmooth_rarity ) 					--top left
+	and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > nosmooth_rarity )--top middle
+	and not (perlin1:get2d({x=x1, y=z1}) > nosmooth_rarity) 						--bottom right
+	and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > nosmooth_rarity) 			--right middle
+	and not (perlin1:get2d({x=x0, y=z1}) > nosmooth_rarity)  						--bottom left
+	and not (perlin1:get2d({x=x1, y=z0}) > nosmooth_rarity)						--top right
+	and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > nosmooth_rarity) 			--left middle
+	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > nosmooth_rarity) 			--middle
+	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > nosmooth_rarity) then		--bottom middle
 		print("[riesenpilz] abort")
 		return
 	end
@@ -94,7 +106,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
 		local d_p_pos = data[p_pos]
-		for _,nam in ipairs({c_tree, c_leaves, c_apple}) do			
+		for _,nam in ipairs({c_tree, c_leaves, c_apple, c_jungletree, c_jungleleaves, c_junglegrass}) do			
 			if d_p_pos == nam then
 				data[p_pos] = c_air
 				break
@@ -120,9 +132,17 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			--smooth mapgen
 			if riesenpilz.always_generate then
 				in_biome = true
-			elseif smooth and (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
+			elseif smooth
+			and (
+				test > smooth_rarity_full
+				or (
+					test > smooth_rarity_ran
+					and pr:next(0,smooth_rarity_dif) > (smooth_rarity_full - test) * 100
+				)
+			) then
 				in_biome = true
-			elseif (not smooth) and test > 0.53 then
+			elseif (not smooth)
+			and test > nosmooth_rarity then
 				in_biome = true
 			end
 
@@ -168,6 +188,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						data[p_boden] = c_dry_shrub
 					elseif pr:next(1,80) == 1 then
 						riesenpilz_circle(c_riesenpilz_brown, boden, pr:next(3,4), 3)
+					elseif pr:next(1,85) == 1 then
+						riesenpilz_circle(c_riesenpilz_parasol, boden, pr:next(3,5), 3)
 					elseif pr:next(1,90) == 1 then
 						riesenpilz_circle(c_riesenpilz_red, boden, pr:next(4,5), 3)
 					elseif pr:next(1,100) == 1 then

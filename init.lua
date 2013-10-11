@@ -424,12 +424,30 @@ local BOX_NETHER_SHROOM = {
 	},
 }
 
-pilz("brown", "Brown Mushroom", BOX_BROWN)
-pilz("red", "Red Mushroom", BOX_RED)
-pilz("fly_agaric", "Fly Agaric", BOX_FLY_AGARIC)
-pilz("lavashroom", "Lavashroom", BOX_LAVASHROOM)
-pilz("glowshroom", "Glowshroom", BOX_GLOWSHROOM)
-pilz("nether_shroom", "Nether Mushroom", BOX_NETHER_SHROOM)
+local BOX_PARASOL = {
+	type = "fixed",
+	fixed = {
+		{-1/16, -8/16, -1/16, 1/16,		0, 1/16},
+		{-2/16, -6/16, -2/16, 2/16, -5/16, 2/16},
+		{-5/16, -4/16, -5/16, 5/16, -3/16, 5/16},
+		{-4/16, -3/16, -4/16, 4/16, -2/16, 4/16},
+		{-3/16, -2/16, -3/16, 3/16, -1/16, 3/16},
+	},
+}
+
+local mushrooms_list = {
+	{"brown", "Brown Mushroom", BOX_BROWN},
+	{"red", "Red Mushroom", BOX_RED},
+	{"fly_agaric", "Fly Agaric", BOX_FLY_AGARIC},
+	{"lavashroom", "Lavashroom", BOX_LAVASHROOM},
+	{"glowshroom", "Glowshroom", BOX_GLOWSHROOM},
+	{"nether_shroom", "Nether Mushroom", BOX_NETHER_SHROOM},
+	{"parasol", "Parasol Mushroom", BOX_PARASOL},
+}
+
+for _,i in ipairs(mushrooms_list) do
+	pilz(i[1], i[2], i[3])
+end
 
 
 
