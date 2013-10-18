@@ -119,7 +119,7 @@ function riesenpilz_minecraft_fliegenpilz(pos)
 	manip:update_map()
 
 	for _,v in ipairs(tab) do
-		minetest.env:set_node(v[1], v[2])
+		minetest.set_node(v[1], v[2])
 	end
 	print(string.format("[riesenpilz] a fly agaric grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
 end
@@ -318,14 +318,14 @@ minetest.register_node(":default:apple", {
 	node_box = {
 		type = "fixed",
 		fixed = {
-		{-3/16,	-7/16,	-3/16,	3/16,	1/16,	3/16},
-		{-4/16,	-6/16,	-3/16,	4/16,	0,		3/16},
-		{-3/16,	-6/16,	-4/16,	3/16,	0,		4/16},
-		{-1/32,	1/16,	-1/32,	1/32,	4/16,	1/32},
-		{-1/16,	1.6/16,	0,		1/16,	1.8/16,	1/16},
-		{-2/16,	1.4/16,	1/16,	1/16,	1.6/16,	2/16},
-		{-2/16,	1.2/16,	2/16,	0,		1.4/16,	3/16},
-		{-1.5/16,	1/16,	.5/16,	0.5/16,		1.2/16,	2.5/16},
+			{-3/16,	-7/16,	-3/16,	3/16,	1/16,	3/16},
+			{-4/16,	-6/16,	-3/16,	4/16,	0,		3/16},
+			{-3/16,	-6/16,	-4/16,	3/16,	0,		4/16},
+			{-1/32,	1/16,	-1/32,	1/32,	4/16,	1/32},
+			{-1/16,	1.6/16,	0,		1/16,	1.8/16,	1/16},
+			{-2/16,	1.4/16,	1/16,	1/16,	1.6/16,	2/16},
+			{-2/16,	1.2/16,	2/16,	0,		1.4/16,	3/16},
+			{-1.5/16,	1/16,	.5/16,	0.5/16,		1.2/16,	2.5/16},
 		}
 	},
 	groups = {fleshy=3,dig_immediate=3,flammable=2,leafdecay=3,leafdecay_drop=1},
@@ -333,7 +333,7 @@ minetest.register_node(":default:apple", {
 	sounds = default.node_sound_defaults(),
 	after_place_node = function(pos, placer, itemstack)
 		if placer:is_player() then
-			minetest.env:set_node(pos, {name="default:apple", param2=1})
+			minetest.set_node(pos, {name="default:apple", param2=1})
 		end
 	end,
 })
@@ -435,6 +435,7 @@ local BOX_PARASOL = {
 	},
 }
 
+
 local mushrooms_list = {
 	{"brown", "Brown Mushroom", BOX_BROWN},
 	{"red", "Red Mushroom", BOX_RED},
@@ -465,20 +466,35 @@ minetest.register_node("riesenpilz:"..name, {
 })
 end
 
-pilznode("stem", "Giant Mushroom Stem", {"riesenpilz_stem_top.png","riesenpilz_stem_top.png","riesenpilz_stem.png"}, "stem")
-pilznode("stem_brown", "Giant Mushroom Stem Brown",
-{"riesenpilz_stem_top.png","riesenpilz_stem_top.png","riesenpilz_stem_brown.png"}, "stem_brown")
-pilznode("lamellas", "Giant Mushroom Lamella", {"riesenpilz_lamellas.png"}, "lamellas")
-pilznode("head_red", "Giant Mushroom Head Red", {"riesenpilz_head.png", "riesenpilz_lamellas.png", "riesenpilz_head.png"}, "red")
-pilznode("head_orange", "Giant Mushroom Head Red", {"riesenpilz_head_orange.png"}, "lavashroom")
-pilznode("head_yellow", "Giant Mushroom Head Red", {"riesenpilz_head_yellow.png"}, "lavashroom")
-pilznode("head_brown", "Giant Mushroom Head Brown",
-{"riesenpilz_brown_top.png","riesenpilz_lamellas.png","riesenpilz_brown_top.png"}, "brown")
-pilznode("head_brown_full", "Giant Mushroom Head Full Brown", {"riesenpilz_brown_top.png"},"brown")
-pilznode("head_blue_bright", "Giant Mushroom Head Blue Bright", {"riesenpilz_head_blue_bright.png"},"glowshroom")
-pilznode("head_blue", "Giant Mushroom Head Blue", {"riesenpilz_head_blue.png"},"glowshroom")
-pilznode("stem_blue", "Giant Mushroom Stem Blue",
-{"riesenpilz_stem_top.png","riesenpilz_stem_top.png","riesenpilz_stem_blue.png"}, "stem_blue")
+
+local r = "riesenpilz_"
+local h = "head_"
+local s = "stem_"
+local rh = r..h
+local rs = r..s
+
+local GS = "Giant Mushroom "
+local GSH = GS.."Head "
+local GSS = GS.."Stem "
+
+local pilznode_list = {
+	{"stem", GSS.."Beige", {rs.."top.png", rs.."top.png", "riesenpilz_stem.png"}, "stem"},
+	{s.."brown", GSS.."Brown", {rs.."top.png", rs.."top.png", rs.."brown.png"}, s.."brown"},
+	{"lamellas", "Giant Mushroom Lamella", {"riesenpilz_lamellas.png"}, "lamellas"},
+	{h.."red", GSH.."Red", {"riesenpilz_head.png", "riesenpilz_lamellas.png", "riesenpilz_head.png"}, "red"},
+	{h.."orange", GSH.."Orange", {rh.."orange.png"}, "lavashroom"},
+	{h.."yellow", GSH.."Yellow", {rh.."yellow.png"}, "lavashroom"},
+	{h.."brown", GSH.."Brown", {r.."brown_top.png", r.."lamellas.png", r.."brown_top.png"}, "brown"},
+	{h.."brown_full", GSH.."Full Brown", {r.."brown_top.png"},"brown"},
+	{h.."blue_bright", GSH.."Blue Bright", {rh.."blue_bright.png"},"glowshroom"},
+	{h.."blue", GSH.."Blue", {rh.."blue.png"},"glowshroom"},
+	{s.."blue", GSS.."Blue", {rs.."top.png",rs.."top.png",rs.."blue.png"}, s.."blue"},
+}
+
+for _,i in ipairs(pilznode_list) do
+	pilznode(i[1], i[2], i[3], i[4])
+end
+
 
 minetest.register_node("riesenpilz:head_red_side", {
 	description = "Giant Mushroom Head Side",
