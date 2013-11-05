@@ -1,5 +1,21 @@
 local MAX_SIZE = 3
 
+local function set_vm_data(manip, nodes, pos, t1, name)
+	manip:set_data(nodes)
+	manip:write_to_map()
+	print(string.format("[riesenpilz] a "..name.." mushroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") after ca. %.2fs", os.clock() - t1))
+	local t1 = os.clock()
+	manip:update_map()
+	print(string.format("[riesenpilz] map updated after ca. %.2fs", os.clock() - t1))
+end
+
+local function r_area(manip, width, height, pos)
+	local emerged_pos1, emerged_pos2 = manip:read_from_map(
+		{x=pos.x-width, y=pos.y, z=pos.z-width},
+		{x=pos.x+width, y=pos.y+height, z=pos.z+width}
+	)
+	return VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+end
 
 --Growing Functions
 
@@ -7,12 +23,7 @@ function riesenpilz_hybridpilz(pos)
 
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
-	local vwidth = MAX_SIZE + 1
-	local vheight = vwidth + 1
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-
+	local area = r_area(manip, MAX_SIZE+1, MAX_SIZE+2, pos)
 	local nodes = manip:get_data()
 
 	local breite = math.random(MAX_SIZE)
@@ -37,10 +48,7 @@ function riesenpilz_hybridpilz(pos)
 		end
 	end
 
-	manip:set_data(nodes)
-	manip:write_to_map()
-	print(string.format("[riesenpilz] a red mushroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
-	manip:update_map()
+	set_vm_data(manip, nodes, pos, t1, "red")
 end
 
 
@@ -48,12 +56,7 @@ function riesenpilz_brauner_minecraftpilz(pos)
 
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
-	local vwidth = MAX_SIZE + 1
-	local vheight = vwidth + 1
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-
+	local area = r_area(manip, MAX_SIZE+1, MAX_SIZE+2, pos)
 	local nodes = manip:get_data()
 
 	local random = math.random(MAX_SIZE-1)
@@ -75,10 +78,7 @@ function riesenpilz_brauner_minecraftpilz(pos)
 		end
 	end
 
-	manip:set_data(nodes)
-	manip:write_to_map()
-	print(string.format("[riesenpilz] a brown mushroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
-	manip:update_map()
+	set_vm_data(manip, nodes, pos, t1, "brown")
 end
 
 
@@ -86,11 +86,7 @@ function riesenpilz_minecraft_fliegenpilz(pos)
 
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
-	local vwidth = 1
-	local vheight = 4
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	local area = r_area(manip, 1, 4, pos)
 	local nodes = manip:get_data()
 
 	local height = 3
@@ -136,12 +132,7 @@ function riesenpilz_lavashroom(pos)
 
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
-	local vwidth = 4
-	local vheight = MAX_SIZE+7
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-
+	local area = r_area(manip, 4, MAX_SIZE+7, pos)
 	local nodes = manip:get_data()
 
 	local height = 3+math.random(MAX_SIZE-2)
@@ -194,10 +185,7 @@ function riesenpilz_lavashroom(pos)
 		end
 	end
 
-	manip:set_data(nodes)
-	manip:write_to_map()
-	print(string.format("[riesenpilz] a lavashroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
-	manip:update_map()
+	set_vm_data(manip, nodes, pos, t1, "lavashroom")
 end
 
 
@@ -205,12 +193,7 @@ function riesenpilz_glowshroom(pos)
 
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
-	local vwidth = 2
-	local vheight = 5+MAX_SIZE
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-
+	local area = r_area(manip, 2, MAX_SIZE+5, pos)
 	local nodes = manip:get_data()
 
 	local height = 2+math.random(MAX_SIZE)
@@ -244,10 +227,40 @@ function riesenpilz_glowshroom(pos)
 		end
 	end
 
-	manip:set_data(nodes)
-	manip:write_to_map()
-	print(string.format("[riesenpilz] a glowshroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
-	manip:update_map()
+	set_vm_data(manip, nodes, pos, t1, "glowshroom")
+end
+
+
+function riesenpilz_parasol(pos)
+	local t1 = os.clock()
+	local manip = minetest.get_voxel_manip()
+	local area = r_area(manip, 2, 5+MAX_SIZE, pos)
+	local nodes = manip:get_data()
+
+	local height = 4+math.random(MAX_SIZE)
+	local rh = math.random(2,3)
+
+	--stem
+	for i = 0, height-1, 1 do
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem
+	end
+
+	--ring
+	for l = 0, 1, 1 do
+		for k = -1, 1, 2 do
+			nodes[area:index(pos.x+k, pos.y+rh, pos.z-l*k)] = riesenpilz_c_head_brown
+			nodes[area:index(pos.x+l*k, pos.y+rh, pos.z+k)] = riesenpilz_c_head_red
+		end
+	end
+
+	--head
+	for i = -2,2,1 do
+		for j = -2,2,1 do
+			nodes[area:index(pos.x+i, pos.y+height, pos.z+j)] = riesenpilz_c_head_brown
+		end
+	end
+
+	set_vm_data(manip, nodes, pos, t1, "parasol")
 end
 
 
@@ -255,12 +268,7 @@ function riesenpilz_apple(pos)
 
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
-	local vwidth = 5
-	local vheight = 14
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-
+	local area = r_area(manip, 5, 14, pos)
 	local nodes = manip:get_data()
 
 	local size = 5
@@ -297,7 +305,7 @@ function riesenpilz_apple(pos)
 
 	manip:set_data(nodes)
 	manip:write_to_map()
-	print(string.format("[riesenpilz] an apple grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
+	print(string.format("[riesenpilz] an apple grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") after ca. %.2fs", os.clock() - t1))
 	manip:update_map()
 end
 
@@ -306,15 +314,16 @@ end
 --3D apple [3apple]
 
 
+local tmp = minetest.registered_nodes["default:apple"]
 minetest.register_node(":default:apple", {
-	description = "Apple",
+	description = tmp.description,
 	drawtype = "nodebox",
-	visual_scale = 1.0,
+	visual_scale = tmp.visual_scale,
 	tiles = {"3apple_apple_top.png","3apple_apple_bottom.png","3apple_apple.png"},
-	inventory_image = "default_apple.png",
-	sunlight_propagates = true,
-	walkable = false,
-	paramtype = "light",
+	inventory_image = tmp.inventory_image,
+	sunlight_propagates = tmp.sunlight_propagates,
+	walkable = tmp.walkable,
+	paramtype = tmp.paramtype,
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -328,14 +337,10 @@ minetest.register_node(":default:apple", {
 			{-1.5/16,	1/16,	.5/16,	0.5/16,		1.2/16,	2.5/16},
 		}
 	},
-	groups = {fleshy=3,dig_immediate=3,flammable=2,leafdecay=3,leafdecay_drop=1},
-	on_use = minetest.item_eat(1),
-	sounds = default.node_sound_defaults(),
-	after_place_node = function(pos, placer, itemstack)
-		if placer:is_player() then
-			minetest.set_node(pos, {name="default:apple", param2=1})
-		end
-	end,
+	groups = tmp.groups,
+	on_use = tmp.on_use,
+	sounds = tmp.sounds,
+	after_place_node = tmp.after_place_node,
 })
 
 
@@ -343,107 +348,86 @@ minetest.register_node(":default:apple", {
 --Mushroom Nodes
 
 
-local function pilz(name, desc, box)
-minetest.register_node("riesenpilz:"..name, {
-	description = desc,
-	tiles = {"riesenpilz_"..name.."_top.png", "riesenpilz_"..name.."_bottom.png", "riesenpilz_"..name.."_side.png"},
-	inventory_image = "riesenpilz_"..name.."_side.png",
-	walkable = false,
-	buildable_to = true,
-	drawtype = "nodebox",
-	paramtype = "light",
-	groups = {snappy=3,flammable=2,attached_node=1},
-	sounds =  default.node_sound_leaves_defaults(),
-	node_box = box,
-	selection_box = box,
-})
+local function pilz(name, desc, b)
+	local box = {
+		type = "fixed",
+		fixed = b
+	}
+	minetest.register_node("riesenpilz:"..name, {
+		description = desc,
+		tiles = {"riesenpilz_"..name.."_top.png", "riesenpilz_"..name.."_bottom.png", "riesenpilz_"..name.."_side.png"},
+		inventory_image = "riesenpilz_"..name.."_side.png",
+		walkable = false,
+		buildable_to = true,
+		drawtype = "nodebox",
+		paramtype = "light",
+		groups = {snappy=3,flammable=2,attached_node=1},
+		sounds =  default.node_sound_leaves_defaults(),
+		node_box = box,
+		selection_box = box
+	})
 end
 
-local BOX_RED = {
-	type = "fixed",
-	fixed = {
+local BOX = {
+	RED = {
 		{-1/16, -8/16, -1/16, 1/16, -6/16, 1/16},
 		{-3/16, -6/16, -3/16, 3/16, -5/16, 3/16},
 		{-4/16, -5/16, -4/16, 4/16, -4/16, 4/16},
 		{-3/16, -4/16, -3/16, 3/16, -3/16, 3/16},
-		{-2/16, -3/16, -2/16, 2/16, -2/16, 2/16},
+		{-2/16, -3/16, -2/16, 2/16, -2/16, 2/16}
 	},
-}
-
-local BOX_BROWN = {
-	type = "fixed",
-	fixed = {
+	BROWN = {
 		{-0.15, -0.2, -0.15, 0.15, -0.1, 0.15},
 		{-0.2, -0.3, -0.2, 0.2, -0.2, 0.2},
 		{-0.05, -0.5, -0.05, 0.05, -0.3, 0.05}
 	},
-}
-
-local BOX_FLY_AGARIC = {
-	type = "fixed",
-	fixed = {
+	FLY_AGARIC = {
 		{-0.05, -0.5, -0.05, 0.05, 1/20, 0.05},
 		{-3/20, -6/20, -3/20, 3/20, 0, 3/20},
-		{-4/20, -2/20, -4/20, 4/20, -4/20, 4/20},
+		{-4/20, -2/20, -4/20, 4/20, -4/20, 4/20}
 	},
-}
-
-local BOX_LAVASHROOM = {
-	type = "fixed",
-	fixed = {
+	LAVASHROOM = {
 		{-1/16, -8/16, -1/16, 1/16, -6/16, 1/16},
 		{-2/16, -6/16, -2/16, 2/16,     0, 2/16},
 		{-3/16, -5/16, -3/16, 3/16, -1/16, 3/16},
-		{-4/16, -4/16, -4/16, 4/16, -2/16, 4/16},
+		{-4/16, -4/16, -4/16, 4/16, -2/16, 4/16}
 	},
-}
-
-local BOX_GLOWSHROOM = {
-	type = "fixed",
-	fixed = {
+	GLOWSHROOM = {
 		{-1/16, -8/16, -1/16, 1/16, -1/16, 1/16},
 		{-2/16, -3/16, -2/16, 2/16, -2/16, 2/16},
 		{-3/16, -5/16, -3/16, 3/16, -3/16, 3/16},
 		{-3/16, -7/16, -3/16, -2/16, -5/16, -2/16},
 		{3/16, -7/16, -3/16, 2/16, -5/16, -2/16},
 		{-3/16, -7/16, 3/16, -2/16, -5/16, 2/16},
-		{3/16, -7/16, 3/16, 2/16, -5/16, 2/16},
+		{3/16, -7/16, 3/16, 2/16, -5/16, 2/16}
 	},
-}
-
-local BOX_NETHER_SHROOM = {
-	type = "fixed",
-	fixed = {
+	NETHER_SHROOM = {
 		{-1/16, -8/16, -1/16, 1/16, -2/16, 1/16},
 		{-2/16, -6/16, -2/16, 2/16, -5/16, 2/16},
 		{-3/16, -2/16, -3/16, 3/16,     0, 3/16},
 		{-4/16, -1/16, -4/16, 4/16,  1/16,-2/16},
 		{-4/16, -1/16,  2/16, 4/16,  1/16, 4/16},
 		{-4/16, -1/16, -2/16,-2/16,  1/16, 2/16},
-		{ 2/16, -1/16, -2/16, 4/16,  1/16, 2/16},
+		{ 2/16, -1/16, -2/16, 4/16,  1/16, 2/16}
 	},
-}
-
-local BOX_PARASOL = {
-	type = "fixed",
-	fixed = {
+	PARASOL = {
 		{-1/16, -8/16, -1/16, 1/16,		0, 1/16},
 		{-2/16, -6/16, -2/16, 2/16, -5/16, 2/16},
 		{-5/16, -4/16, -5/16, 5/16, -3/16, 5/16},
 		{-4/16, -3/16, -4/16, 4/16, -2/16, 4/16},
-		{-3/16, -2/16, -3/16, 3/16, -1/16, 3/16},
-	},
+		{-3/16, -2/16, -3/16, 3/16, -1/16, 3/16}
+	}
 }
 
 
 local mushrooms_list = {
-	{"brown", "Brown Mushroom", BOX_BROWN},
-	{"red", "Red Mushroom", BOX_RED},
-	{"fly_agaric", "Fly Agaric", BOX_FLY_AGARIC},
-	{"lavashroom", "Lavashroom", BOX_LAVASHROOM},
-	{"glowshroom", "Glowshroom", BOX_GLOWSHROOM},
-	{"nether_shroom", "Nether Mushroom", BOX_NETHER_SHROOM},
-	{"parasol", "Parasol Mushroom", BOX_PARASOL},
+	{"brown", "Brown Mushroom", BOX.BROWN},
+	{"red", "Red Mushroom", BOX.RED},
+	{"fly_agaric", "Fly Agaric", BOX.FLY_AGARIC},
+	{"lavashroom", "Lavashroom", BOX.LAVASHROOM},
+	{"glowshroom", "Glowshroom", BOX.GLOWSHROOM},
+	{"nether_shroom", "Nether Mushroom", BOX.NETHER_SHROOM},
+	{"parasol", "Parasol Mushroom", BOX.PARASOL},
 }
 
 for _,i in ipairs(mushrooms_list) do
@@ -561,6 +545,8 @@ minetest.register_on_punchnode(function(pos, node, puncher)
 			riesenpilz_lavashroom(pos)
 		elseif name == "riesenpilz:glowshroom" then
 			riesenpilz_glowshroom(pos)
+		elseif name == "riesenpilz:parasol" then
+			riesenpilz_parasol(pos)
 		elseif name == "default:apple" then
 			riesenpilz_apple(pos)
 		end
