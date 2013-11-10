@@ -233,30 +233,46 @@ end
 
 function riesenpilz_parasol(pos)
 	local t1 = os.clock()
+
+	local height = 6+math.random(MAX_SIZE)
+	local br = math.random(MAX_SIZE+1,MAX_SIZE+2)
+
 	local manip = minetest.get_voxel_manip()
-	local area = r_area(manip, 2, 5+MAX_SIZE, pos)
+	local area = r_area(manip, br, height, pos)
 	local nodes = manip:get_data()
 
-	local height = 4+math.random(MAX_SIZE)
 	local rh = math.random(2,3)
+	local bhead1 = br-1
+	local bhead2 = math.random(1,br-2)
 
 	--stem
-	for i = 0, height-1, 1 do
+	for i = 0, height-2 do
 		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem
 	end
 
-	--ring
-	for l = 0, 1, 1 do
-		for k = -1, 1, 2 do
-			nodes[area:index(pos.x+k, pos.y+rh, pos.z-l*k)] = riesenpilz_c_head_brown
-			nodes[area:index(pos.x+l*k, pos.y+rh, pos.z+k)] = riesenpilz_c_head_red
+	for i = -bhead2,bhead2 do
+		for j = -bhead2,bhead2 do
+			nodes[area:index(pos.x+i, pos.y+height, pos.z+j)] = riesenpilz_c_head_brown_bright
+		end
+	end
+	for i = -bhead1,bhead1 do
+		for j = -bhead1,bhead1 do
+			nodes[area:index(pos.x+i, pos.y+height-1, pos.z+j)] = riesenpilz_c_head_binge
 		end
 	end
 
-	--head
-	for i = -2,2,1 do
-		for j = -2,2,1 do
-			nodes[area:index(pos.x+i, pos.y+height, pos.z+j)] = riesenpilz_c_head_brown
+	for k = -1, 1, 2 do
+		for l = 0, 1 do
+			nodes[area:index(pos.x+k, pos.y+rh, pos.z-l*k)] = riesenpilz_c_head_white
+			nodes[area:index(pos.x+l*k, pos.y+rh, pos.z+k)] = riesenpilz_c_head_white
+		end
+		for l = -br+1, br do
+			nodes[area:index(pos.x+br*k, pos.y+height-2, pos.z-l*k)] = riesenpilz_c_head_binge
+			nodes[area:index(pos.x+l*k, pos.y+height-2, pos.z+br*k)] = riesenpilz_c_head_binge
+		end
+		for l = -bhead1+1, bhead1 do
+			nodes[area:index(pos.x+bhead1*k, pos.y+height-2, pos.z-l*k)] = riesenpilz_c_head_white
+			nodes[area:index(pos.x+l*k, pos.y+height-2, pos.z+bhead1*k)] = riesenpilz_c_head_white
 		end
 	end
 
@@ -464,6 +480,7 @@ local GSS = GS.."Stem "
 local pilznode_list = {
 	{"stem", GSS.."Beige", {rs.."top.png", rs.."top.png", "riesenpilz_stem.png"}, "stem"},
 	{s.."brown", GSS.."Brown", {rs.."top.png", rs.."top.png", rs.."brown.png"}, s.."brown"},
+	{s.."blue", GSS.."Blue", {rs.."top.png",rs.."top.png",rs.."blue.png"}, s.."blue"},
 	{"lamellas", "Giant Mushroom Lamella", {"riesenpilz_lamellas.png"}, "lamellas"},
 	{h.."red", GSH.."Red", {"riesenpilz_head.png", "riesenpilz_lamellas.png", "riesenpilz_head.png"}, "red"},
 	{h.."orange", GSH.."Orange", {rh.."orange.png"}, "lavashroom"},
@@ -472,7 +489,9 @@ local pilznode_list = {
 	{h.."brown_full", GSH.."Full Brown", {r.."brown_top.png"},"brown"},
 	{h.."blue_bright", GSH.."Blue Bright", {rh.."blue_bright.png"},"glowshroom"},
 	{h.."blue", GSH.."Blue", {rh.."blue.png"},"glowshroom"},
-	{s.."blue", GSS.."Blue", {rs.."top.png",rs.."top.png",rs.."blue.png"}, s.."blue"},
+	{h.."white", GSH.."White", {rh.."white.png"},"parasol"},
+	{h.."binge", GSH.."Binge", {rh.."binge.png", rh.."white.png", rh.."binge.png"},"parasol"},
+	{h.."brown_bright", GSH.."Brown Bright", {rh.."brown_bright.png", rh.."white.png", rh.."brown_bright.png"},"parasol"},
 }
 
 for _,i in ipairs(pilznode_list) do
@@ -516,6 +535,10 @@ riesenpilz_c_head_yellow = minetest.get_content_id("riesenpilz:head_yellow")
 riesenpilz_c_stem_blue = minetest.get_content_id("riesenpilz:stem_blue")
 riesenpilz_c_head_blue = minetest.get_content_id("riesenpilz:head_blue")
 riesenpilz_c_head_blue_bright = minetest.get_content_id("riesenpilz:head_blue_bright")
+
+riesenpilz_c_head_white = minetest.get_content_id("riesenpilz:head_white")
+riesenpilz_c_head_binge = minetest.get_content_id("riesenpilz:head_binge")
+riesenpilz_c_head_brown_bright = minetest.get_content_id("riesenpilz:head_brown_bright")
 
 riesenpilz_c_red = minetest.get_content_id("default:copperblock")
 riesenpilz_c_brown = minetest.get_content_id("default:desert_stone")

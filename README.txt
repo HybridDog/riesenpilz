@@ -1,6 +1,7 @@
 ------Mushrooms------
-— riesenpilz_head.png and riesenpilz_stem.png (edited with gimp) from gamiano.de
+— riesenpilz_stem.png (edited with gimp) from gamiano.de
 
 TODO:
-— add giant nethershroom and parasol
+— add giant nethershroom
 — finish supporting the mushrooms mod
+— generate mushrooms not only in mushroom biomes

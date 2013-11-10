@@ -220,6 +220,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					elseif pr:next(1,6000) == 2 and pr:next(1,200) == 15 then
 						tab[num] = {4, boden}
 						num = num+1
+					elseif pr:next(1,800) == 7 then
+						tab[num] = {5, boden}
+						num = num+1
 					end
 				end
 			end
@@ -236,14 +239,17 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	for _,v in ipairs(tab) do
 		local p = v[2]
-		if v[1] == 1 then
+		local m = v[1]
+		if m == 1 then
 			riesenpilz_hybridpilz(p)
-		elseif v[1] == 2 then
+		elseif m == 2 then
 			riesenpilz_brauner_minecraftpilz(p)
-		elseif v[1] == 3 then
+		elseif m == 3 then
 			riesenpilz_minecraft_fliegenpilz(p)
-		elseif v[1] == 4 then
+		elseif m == 4 then
 			riesenpilz_lavashroom(p)
+		elseif m == 5 then
+			riesenpilz_parasol(p)
 		end
 	end
 	if riesenpilz.info then
