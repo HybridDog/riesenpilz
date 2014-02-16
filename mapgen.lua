@@ -229,8 +229,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 	vm:set_data(data)
-	--vm:set_lighting({day=0, night=0})
-	vm:calc_lighting()
 	vm:update_liquids()
 	vm:write_to_map()
 	if riesenpilz.info then

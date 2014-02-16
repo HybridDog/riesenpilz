@@ -1,4 +1,13 @@
+local load_time_start = os.clock()
 local MAX_SIZE = 3
+
+local function r_area(manip, width, height, pos)
+	local emerged_pos1, emerged_pos2 = manip:read_from_map(
+		{x=pos.x-width, y=pos.y, z=pos.z-width},
+		{x=pos.x+width, y=pos.y+height, z=pos.z+width}
+	)
+	return VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+end
 
 local function set_vm_data(manip, nodes, pos, t1, name)
 	manip:set_data(nodes)
@@ -7,14 +16,6 @@ local function set_vm_data(manip, nodes, pos, t1, name)
 	local t1 = os.clock()
 	manip:update_map()
 	print(string.format("[riesenpilz] map updated after ca. %.2fs", os.clock() - t1))
-end
-
-local function r_area(manip, width, height, pos)
-	local emerged_pos1, emerged_pos2 = manip:read_from_map(
-		{x=pos.x-width, y=pos.y, z=pos.z-width},
-		{x=pos.x+width, y=pos.y+height, z=pos.z+width}
-	)
-	return VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
 end
 
 --Growing Functions
@@ -64,8 +65,8 @@ function riesenpilz_brauner_minecraftpilz(pos)
 	local breite = br+1
 	local height = br+2
 
-	for i = 0, height, 1 do
-		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem
+	for i in area:iterp(pos, {x=pos.x, y=pos.y+height, z=pos.z}) do
+		nodes[i] = riesenpilz_c_stem
 	end
 
 	for l = -br, br, 1 do
@@ -246,18 +247,16 @@ function riesenpilz_parasol(pos)
 	local bhead2 = math.random(1,br-2)
 
 	--stem
-	for i = 0, height-2 do
-		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem
+	for i in area:iterp(pos, {x=pos.x, y=pos.y+height-2, z=pos.z}) do
+		nodes[i] = riesenpilz_c_stem
 	end
 
-	for i = -bhead2,bhead2 do
-		for j = -bhead2,bhead2 do
-			nodes[area:index(pos.x+i, pos.y+height, pos.z+j)] = riesenpilz_c_head_brown_bright
-		end
-	end
-	for i = -bhead1,bhead1 do
-		for j = -bhead1,bhead1 do
-			nodes[area:index(pos.x+i, pos.y+height-1, pos.z+j)] = riesenpilz_c_head_binge
+	for _,j in ipairs({
+		{bhead2, 0, riesenpilz_c_head_brown_bright},
+		{bhead1, -1, riesenpilz_c_head_binge}
+	}) do
+		for i in area:iter(pos.x-j[1], pos.y+height+j[2], pos.z-j[1], pos.x+j[1], pos.y+height+j[2], pos.z+j[1]) do
+			nodes[i] = j[3]
 		end
 	end
 
@@ -584,4 +583,4 @@ if riesenpilz.enable_mapgen then
 	dofile(minetest.get_modpath("riesenpilz") .. "/mapgen.lua")
 end
 
-print("[riesenpilz] Loaded!") 
+print(string.format("[riesenpilz] loaded after ca. %.2fs", os.clock() - load_time_start))
