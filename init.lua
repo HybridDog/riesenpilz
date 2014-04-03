@@ -89,10 +89,9 @@ function riesenpilz_minecraft_fliegenpilz(pos)
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, 1, 4, pos)
 	local nodes = manip:get_data()
+	local param2s = manip:get_param2_data() 
 
 	local height = 3
-	local tab = {}
-	local num = 1
 
 	for i = 0, height, 1 do
 		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem
@@ -103,21 +102,24 @@ function riesenpilz_minecraft_fliegenpilz(pos)
 			nodes[area:index(pos.x+j, pos.y+height+1, pos.z+k)] = riesenpilz_c_head_red
 		end
 		for l = 1, height, 1 do
-			tab[num] = {{x=pos.x+j, y=pos.y+l, z=pos.z+2}, {name="riesenpilz:head_red_side", param2=0}}
-			tab[num+1] = {{x=pos.x+j, y=pos.y+l, z=pos.z-2}, {name="riesenpilz:head_red_side", param2=2}}
-			tab[num+2] = {{x=pos.x+2, y=pos.y+l, z=pos.z+j}, {name="riesenpilz:head_red_side", param2=1}}
-			tab[num+3] = {{x=pos.x-2, y=pos.y+l, z=pos.z+j}, {name="riesenpilz:head_red_side", param2=3}}
-			num = num+4
+			local y = pos.y+l
+			for _,p in ipairs({
+				{area:index(pos.x+j, y, pos.z+2), 0},
+				{area:index(pos.x+j, y, pos.z-2), 2},
+				{area:index(pos.x+2, y, pos.z+j), 1},
+				{area:index(pos.x-2, y, pos.z+j), 3},
+			}) do
+				local tmp = p[1]
+				nodes[tmp] = riesenpilz_c_head_red_side
+				param2s[tmp] = p[2]
+			end
 		end
 	end
 
 	manip:set_data(nodes)
+	manip:set_param2_data(param2s)
 	manip:write_to_map()
 	manip:update_map()
-
-	for _,v in ipairs(tab) do
-		minetest.set_node(v[1], v[2])
-	end
 	print(string.format("[riesenpilz] a fly agaric grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
 end
 
@@ -525,6 +527,8 @@ riesenpilz_c_head_red = minetest.get_content_id("riesenpilz:head_red")
 riesenpilz_c_lamellas = minetest.get_content_id("riesenpilz:lamellas")
 
 riesenpilz_c_head_brown = minetest.get_content_id("riesenpilz:head_brown")
+
+riesenpilz_c_head_red_side = minetest.get_content_id("riesenpilz:head_red_side")
 
 riesenpilz_c_stem_brown = minetest.get_content_id("riesenpilz:stem_brown")
 riesenpilz_c_head_brown_full = minetest.get_content_id("riesenpilz:head_brown_full")
