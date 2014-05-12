@@ -55,12 +55,13 @@ end
 
 local riesenpilz_rarity = riesenpilz.mapgen_rarity
 local riesenpilz_size = riesenpilz.mapgen_size
+local smooth_trans_size = riesenpilz.smooth_trans_size
 
-local nosmooth_rarity = -(riesenpilz_rarity/50)+1
+local nosmooth_rarity = 1-riesenpilz_rarity/50
 local perlin_scale = riesenpilz_size*100/riesenpilz_rarity
-local smooth_rarity_full = nosmooth_rarity+perlin_scale/(20*riesenpilz_size)
-local smooth_rarity_ran = nosmooth_rarity-perlin_scale/(40*riesenpilz_size)
-local smooth_rarity_dif = (smooth_rarity_full-smooth_rarity_ran)*100-1
+local smooth_rarity_max = nosmooth_rarity+smooth_trans_size*2/perlin_scale
+local smooth_rarity_min = nosmooth_rarity-smooth_trans_size/perlin_scale
+local smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
 
 local GROUND	=	{c_gr, c_sand, c_dirt, c_desert_sand}
 --local USUAL_STUFF =	{"default:leaves","default:apple","default:tree","default:cactus","default:papyrus"}
@@ -132,15 +133,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			--smooth mapgen
 			if riesenpilz.always_generate then
 				in_biome = true
-			elseif smooth
-			and (
-				test > smooth_rarity_full
+			elseif smooth then
+				if test >= smooth_rarity_max
 				or (
-					test > smooth_rarity_ran
-					and pr:next(0,smooth_rarity_dif) > (smooth_rarity_full - test) * 100
-				)
-			) then
-				in_biome = true
+					test > smooth_rarity_min
+					and pr:next(1, 1000) <= ((test-smooth_rarity_min)/smooth_rarity_dif)*1000
+				) then
+					in_biome = true
+				end
 			elseif (not smooth)
 			and test > nosmooth_rarity then
 				in_biome = true
@@ -271,7 +271,7 @@ end)
 		and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > 0.53) 			--left middle
 		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) 			--middle
 		and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > 0.53) then		--bottom middle
-			print("abortsumpf")
+			print("abortriesenpilz")
 			return
 		end
 		local divs = (maxp.x-minp.x);
