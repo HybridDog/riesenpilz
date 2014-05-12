@@ -365,7 +365,8 @@ minetest.register_node(":default:apple", {
 --Mushroom Nodes
 
 
-local function pilz(name, desc, b)
+local function pilz(name, desc, b, burntime)
+	burntime = burntime or 1
 	local box = {
 		type = "fixed",
 		fixed = b
@@ -381,7 +382,8 @@ local function pilz(name, desc, b)
 		groups = {snappy=3,flammable=2,attached_node=1},
 		sounds =  default.node_sound_leaves_defaults(),
 		node_box = box,
-		selection_box = box
+		selection_box = box,
+		furnace_burntime = burntime
 	})
 end
 
@@ -443,12 +445,12 @@ local mushrooms_list = {
 	{"fly_agaric", "Fly Agaric", BOX.FLY_AGARIC},
 	{"lavashroom", "Lavashroom", BOX.LAVASHROOM},
 	{"glowshroom", "Glowshroom", BOX.GLOWSHROOM},
-	{"nether_shroom", "Nether Mushroom", BOX.NETHER_SHROOM},
+	{"nether_shroom", "Nether Mushroom", BOX.NETHER_SHROOM, 6},
 	{"parasol", "Parasol Mushroom", BOX.PARASOL},
 }
 
 for _,i in ipairs(mushrooms_list) do
-	pilz(i[1], i[2], i[3])
+	pilz(i[1], i[2], i[3], i[4])
 end
 
 
