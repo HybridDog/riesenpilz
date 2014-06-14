@@ -87,7 +87,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > nosmooth_rarity) 			--left middle
 	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > nosmooth_rarity) 			--middle
 	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > nosmooth_rarity) then		--bottom middle
-		print("[riesenpilz] abort")
 		return
 	end
 
@@ -235,7 +234,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		say_info(string.format("ground generated after: %.2fs", os.clock() - t1))
 		t1 = os.clock()
 	end
-	for _,v in ipairs(tab) do
+	for _,v in pairs(tab) do
 		local p = v[2]
 		local m = v[1]
 		if m == 1 then
