@@ -1,8 +1,8 @@
 --This file contains configuration options for riesenpilz mod.
 
---Enables mapgen.
 riesenpilz.enable_mapgen = true
 
+--Generate giant mushroom biomes everywhere
 riesenpilz.always_generate = false
 
 --Enables smooth transition of biomes.
@@ -17,5 +17,11 @@ riesenpilz.mapgen_size = 50
 --approximate size of smooth transitions
 riesenpilz.smooth_trans_size = 2
 
-
+--says some information.
 riesenpilz.info = true
+
+--informs the players too
+riesenpilz.inform_all = minetest.is_singleplayer()
+
+--1:<a bit of information> 2:<acceptable amount of information> 3:<lots of text>
+riesenpilz.max_spam = 2

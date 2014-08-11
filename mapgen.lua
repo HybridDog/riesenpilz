@@ -1,27 +1,45 @@
-local c_air = minetest.get_content_id("air")
-local c_stone = minetest.get_content_id("default:stone")
-local c_gr = minetest.get_content_id("default:dirt_with_grass")
-local c_dirt = minetest.get_content_id("default:dirt")
-local c_sand = minetest.get_content_id("default:sand")
-local c_desert_sand = minetest.get_content_id("default:desert_sand")
+local c
+local function define_contents()
+	c = {
+		air = minetest.get_content_id("air"),
+		stone = minetest.get_content_id("default:stone"),
+		dirt = minetest.get_content_id("default:dirt"),
+		desert_sand = minetest.get_content_id("default:desert_sand"),
 
-local c_tree = minetest.get_content_id("default:tree")
-local c_leaves = minetest.get_content_id("default:leaves")
-local c_apple = minetest.get_content_id("default:apple")
-local c_jungletree = minetest.get_content_id("default:jungletree")
-local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
-local c_junglegrass = minetest.get_content_id("default:junglegrass")
-local c_cactus = minetest.get_content_id("default:cactus")
-local c_papyrus = minetest.get_content_id("default:papyrus")
-local c_dry_shrub = minetest.get_content_id("default:dry_shrub")
+		dry_shrub = minetest.get_content_id("default:dry_shrub"),
 
-local c_ground = minetest.get_content_id("riesenpilz:ground")
-local c_riesenpilz_brown = minetest.get_content_id("riesenpilz:brown")
-local c_riesenpilz_red = minetest.get_content_id("riesenpilz:red")
-local c_riesenpilz_fly_agaric = minetest.get_content_id("riesenpilz:fly_agaric")
-local c_riesenpilz_lavashroom = minetest.get_content_id("riesenpilz:lavashroom")
-local c_riesenpilz_glowshroom = minetest.get_content_id("riesenpilz:glowshroom")
-local c_riesenpilz_parasol = minetest.get_content_id("riesenpilz:parasol")
+		ground = minetest.get_content_id("riesenpilz:ground"),
+		riesenpilz_brown = minetest.get_content_id("riesenpilz:brown"),
+		riesenpilz_red = minetest.get_content_id("riesenpilz:red"),
+		riesenpilz_fly_agaric = minetest.get_content_id("riesenpilz:fly_agaric"),
+		riesenpilz_lavashroom = minetest.get_content_id("riesenpilz:lavashroom"),
+		riesenpilz_glowshroom = minetest.get_content_id("riesenpilz:glowshroom"),
+		riesenpilz_parasol = minetest.get_content_id("riesenpilz:parasol"),
+
+		GROUND = {},
+		TREE_STUFF = {
+			minetest.get_content_id("default:tree"),
+			minetest.get_content_id("default:leaves"),
+			minetest.get_content_id("default:apple"),
+			minetest.get_content_id("default:jungletree"),
+			minetest.get_content_id("default:jungleleaves"),
+			minetest.get_content_id("default:junglegrass"),
+		},
+		USUAL_STUFF = {
+			minetest.get_content_id("default:cactus"),
+			minetest.get_content_id("default:papyrus"),
+		},
+	}
+	for name,data in pairs(minetest.registered_nodes) do
+		local groups = data.groups
+		if groups then
+			if groups.crumbly == 3
+			or groups.soil == 1 then
+				table.insert(c.GROUND, minetest.get_content_id(name))
+			end
+		end
+	end
+end
 
 
 local function find_grond(a,list)
@@ -38,9 +56,9 @@ function riesenpilz_circle(nam, pos, radius, chance)
 	for i = -radius, radius, 1 do
 		for j = -radius, radius, 1 do
 			if math.floor(	math.sqrt(i^2+j^2)	+0.5) == radius
-			and data[area:index(pos.x+i, pos.y, pos.z+j)] == c_air
+			and data[area:index(pos.x+i, pos.y, pos.z+j)] == c.air
 			and pr:next(1,chance) == 1
-			and data[area:index(pos.x+i, pos.y-1, pos.z+j)] == c_ground then
+			and data[area:index(pos.x+i, pos.y-1, pos.z+j)] == c.ground then
 				data[area:index(pos.x+i, pos.y, pos.z+j)] = nam
 			end
 		end
@@ -63,13 +81,15 @@ local smooth_rarity_max = nosmooth_rarity+smooth_trans_size*2/perlin_scale
 local smooth_rarity_min = nosmooth_rarity-smooth_trans_size/perlin_scale
 local smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
 
-local GROUND	=	{c_gr, c_sand, c_dirt, c_desert_sand}
 --local USUAL_STUFF =	{"default:leaves","default:apple","default:tree","default:cactus","default:papyrus"}
+
+local contents_defined
 minetest.register_on_generated(function(minp, maxp, seed)
 	if maxp.y <= 0
 	or minp.y >= 150 then --avoid generation in the sky
 		return
 	end
+
 	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
 	local env = minetest.env	--Should make things a bit faster.
 	local perlin1 = env:get_perlin(51,3, 0.5, perlin_scale)	--Get map specific perlin
@@ -90,9 +110,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		return
 	end
 
-	if riesenpilz.info then
-		say_info("tries to generate at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]")
-		t1 = os.clock()
+	local t1 = os.clock()
+	riesenpilz.inform("tries to generate a giant mushroom biome at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]", 2)
+
+	if not contents_defined then
+		define_contents()
+		contents_defined = true
 	end
 
 	local divs = (maxp.x-minp.x);
@@ -106,9 +129,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
 		local d_p_pos = data[p_pos]
-		for _,nam in ipairs({c_tree, c_leaves, c_apple, c_jungletree, c_jungleleaves, c_junglegrass}) do			
+		for _,nam in ipairs(c.TREE_STUFF) do			
 			if d_p_pos == nam then
-				data[p_pos] = c_air
+				data[p_pos] = c.air
 				break
 			end
 		end
@@ -150,9 +173,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				for b = minp.y,maxp.y,1 do	--remove usual stuff
 					local p_pos = area:index(x, b, z)
 					local d_p_pos = data[p_pos]
-					for _,nam in ipairs({c_cactus, c_papyrus}) do			
+					for _,nam in ipairs(c.USUAL_STUFF) do			
 						if d_p_pos == nam then
-							data[p_pos] = c_air
+							data[p_pos] = c.air
 							break
 						end
 					end
@@ -161,7 +184,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local ground_y = nil --Definition des Bodens:
 --				for y=maxp.y,0,-1 do
 				for y=maxp.y,1,-1 do
-					if find_grond(data[area:index(x, y, z)], GROUND) then
+					if find_grond(data[area:index(x, y, z)], c.GROUND) then
 						ground_y = y
 						break
 					end
@@ -172,31 +195,31 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					local d_p_ground = data[p_ground]
 					local d_p_boden = data[p_boden]
 
-					data[p_ground] = c_ground
+					data[p_ground] = c.ground
 					for i = -1,-5,-1 do
 						local p_pos = area:index(x, ground_y+i, z)
 						local d_p_pos = data[p_pos]
-						if d_p_pos == c_desert_sand then
-							data[p_pos] = c_dirt
+						if d_p_pos == c.desert_sand then
+							data[p_pos] = c.dirt
 						else
 							break
 						end
 					end
 					local boden = {x=x,y=ground_y+1,z=z}
 					if pr:next(1,15) == 1 then
-						data[p_boden] = c_dry_shrub
+						data[p_boden] = c.dry_shrub
 					elseif pr:next(1,80) == 1 then
-						riesenpilz_circle(c_riesenpilz_brown, boden, pr:next(3,4), 3)
+						riesenpilz_circle(c.riesenpilz_brown, boden, pr:next(3,4), 3)
 					elseif pr:next(1,85) == 1 then
-						riesenpilz_circle(c_riesenpilz_parasol, boden, pr:next(3,5), 3)
+						riesenpilz_circle(c.riesenpilz_parasol, boden, pr:next(3,5), 3)
 					elseif pr:next(1,90) == 1 then
-						riesenpilz_circle(c_riesenpilz_red, boden, pr:next(4,5), 3)
+						riesenpilz_circle(c.riesenpilz_red, boden, pr:next(4,5), 3)
 					elseif pr:next(1,100) == 1 then
-						riesenpilz_circle(c_riesenpilz_fly_agaric, boden, 4, 3)
+						riesenpilz_circle(c.riesenpilz_fly_agaric, boden, 4, 3)
 					elseif pr:next(1,4000) == 1 then
-						riesenpilz_circle(c_riesenpilz_lavashroom, boden, pr:next(5,6), 3)
+						riesenpilz_circle(c.riesenpilz_lavashroom, boden, pr:next(5,6), 3)
 					elseif pr:next(1,5000) == 1 then
-						riesenpilz_circle(c_riesenpilz_glowshroom, boden, 3, 3)
+						riesenpilz_circle(c.riesenpilz_glowshroom, boden, 3, 3)
 					--[[elseif pr:next(1,80) == 1 then
 						env:add_node(boden, {name="riesenpilz:brown"})
 					elseif pr:next(1,90) == 1 then
@@ -230,10 +253,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:set_data(data)
 	vm:update_liquids()
 	vm:write_to_map()
-	if riesenpilz.info then
-		say_info(string.format("ground generated after: %.2fs", os.clock() - t1))
-		t1 = os.clock()
-	end
+	riesenpilz.inform("ground finished", 2, t1)
+	local t2 = os.clock()
 	for _,v in pairs(tab) do
 		local p = v[2]
 		local m = v[1]
@@ -249,9 +270,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			riesenpilz_parasol(p)
 		end
 	end
-	if riesenpilz.info then
-		say_info(string.format("giant shrooms generated after: %.2fs", os.clock() - t1))
-	end
+	riesenpilz.inform("giant shrooms generated", 2, t2)
+	riesenpilz.inform("done", 1, t1)
 end)
 --[[	if maxp.y < -10 then
 		local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal

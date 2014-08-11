@@ -1,6 +1,10 @@
 local load_time_start = os.clock()
 local MAX_SIZE = 3
 
+riesenpilz = {}
+dofile(minetest.get_modpath("riesenpilz").."/settings.lua")
+dofile(minetest.get_modpath("riesenpilz").."/functions.lua")
+
 local function r_area(manip, width, height, pos)
 	local emerged_pos1, emerged_pos2 = manip:read_from_map(
 		{x=pos.x-width, y=pos.y, z=pos.z-width},
@@ -600,8 +604,6 @@ end)
 
 
 
-riesenpilz = {}
-dofile(minetest.get_modpath("riesenpilz").."/settings.lua")
 if riesenpilz.enable_mapgen then
 	dofile(minetest.get_modpath("riesenpilz") .. "/mapgen.lua")
 end
