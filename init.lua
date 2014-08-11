@@ -16,19 +16,21 @@ end
 local function set_vm_data(manip, nodes, pos, t1, name)
 	manip:set_data(nodes)
 	manip:write_to_map()
-	print(string.format("[riesenpilz] a "..name.." mushroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") after ca. %.2fs", os.clock() - t1))
+	riesenpilz.inform("a "..name.." mushroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", 3, t1)
 	local t1 = os.clock()
 	manip:update_map()
-	print(string.format("[riesenpilz] map updated after ca. %.2fs", os.clock() - t1))
+	riesenpilz.inform("map updated", 3, t1)
 end
 
 --Growing Functions
+
+local c
 
 function riesenpilz_hybridpilz(pos)
 
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
-	local area = r_area(manip, MAX_SIZE+1, MAX_SIZE+2, pos)
+	local area = r_area(manip, MAX_SIZE+1, MAX_SIZE+3, pos)
 	local nodes = manip:get_data()
 
 	local breite = math.random(MAX_SIZE)
@@ -36,20 +38,20 @@ function riesenpilz_hybridpilz(pos)
 	local height = breite+2
 
 	for i = 0, height, 1 do
-		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = c.stem
 	end
 
 	for l = -br+1, br, 1 do
 		for k = -1, 1, 2 do
-			nodes[area:index(pos.x+br*k, pos.y+height, pos.z-l*k)] = riesenpilz_c_head_red
-			nodes[area:index(pos.x+l*k, pos.y+height, pos.z+br*k)] = riesenpilz_c_head_red
+			nodes[area:index(pos.x+br*k, pos.y+height, pos.z-l*k)] = c.head_red
+			nodes[area:index(pos.x+l*k, pos.y+height, pos.z+br*k)] = c.head_red
 		end
 	end
 
 	for k = -breite, breite, 1 do
 		for l = -breite, breite, 1 do
-			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+k)] = riesenpilz_c_head_red
-			nodes[area:index(pos.x+l, pos.y+height, pos.z+k)] = riesenpilz_c_lamellas
+			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+k)] = c.head_red
+			nodes[area:index(pos.x+l, pos.y+height, pos.z+k)] = c.lamellas
 		end
 	end
 
@@ -70,16 +72,16 @@ function riesenpilz_brauner_minecraftpilz(pos)
 	local height = br+2
 
 	for i in area:iterp(pos, {x=pos.x, y=pos.y+height, z=pos.z}) do
-		nodes[i] = riesenpilz_c_stem
+		nodes[i] = c.stem
 	end
 
 	for l = -br, br, 1 do
 		for k = -breite, breite, breite*2 do
-			nodes[area:index(pos.x+k, pos.y+height+1, pos.z+l)] = riesenpilz_c_head_brown
-			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+k)] = riesenpilz_c_head_brown
+			nodes[area:index(pos.x+k, pos.y+height+1, pos.z+l)] = c.head_brown
+			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+k)] = c.head_brown
 		end
 		for k = -br, br, 1 do
-			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+k)] = riesenpilz_c_head_brown
+			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+k)] = c.head_brown
 		end
 	end
 
@@ -98,12 +100,12 @@ function riesenpilz_minecraft_fliegenpilz(pos)
 	local height = 3
 
 	for i = 0, height, 1 do
-		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = c.stem
 	end
 
 	for j = -1, 1, 1 do
 		for k = -1, 1, 1 do
-			nodes[area:index(pos.x+j, pos.y+height+1, pos.z+k)] = riesenpilz_c_head_red
+			nodes[area:index(pos.x+j, pos.y+height+1, pos.z+k)] = c.head_red
 		end
 		for l = 1, height, 1 do
 			local y = pos.y+l
@@ -114,7 +116,7 @@ function riesenpilz_minecraft_fliegenpilz(pos)
 				{area:index(pos.x-2, y, pos.z+j), 3},
 			}) do
 				local tmp = p[1]
-				nodes[tmp] = riesenpilz_c_head_red_side
+				nodes[tmp] = c.head_red_side
 				param2s[tmp] = p[2]
 			end
 		end
@@ -124,7 +126,7 @@ function riesenpilz_minecraft_fliegenpilz(pos)
 	manip:set_param2_data(param2s)
 	manip:write_to_map()
 	manip:update_map()
-	print(string.format("[riesenpilz] a fly agaric grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
+	riesenpilz.inform("a fly agaric grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", 3, t1)
 end
 
 
@@ -143,44 +145,44 @@ function riesenpilz_lavashroom(pos)
 	local nodes = manip:get_data()
 
 	local height = 3+math.random(MAX_SIZE-2)
-	nodes[area:index(pos.x, pos.y, pos.z)] = riesenpilz_c_air
+	nodes[area:index(pos.x, pos.y, pos.z)] = c.air
 
 	for i = -1, 1, 2 do
 		local o = 2*i
 
 		for n = 0, height, 1 do
-			nodes[area:index(pos.x+i, pos.y+n, pos.z)] = riesenpilz_c_stem_brown
-			nodes[area:index(pos.x, pos.y+n, pos.z+i)] = riesenpilz_c_stem_brown
+			nodes[area:index(pos.x+i, pos.y+n, pos.z)] = c.stem_brown
+			nodes[area:index(pos.x, pos.y+n, pos.z+i)] = c.stem_brown
 		end
 
 		for l = -1, 1, 1 do
 			for k = 2, 3, 1 do
-				nodes[area:index(pos.x+k*i, pos.y+height+2, pos.z+l)] = riesenpilz_c_head_brown_full
-				nodes[area:index(pos.x+l, pos.y+height+2, pos.z+k*i)] = riesenpilz_c_head_brown_full
+				nodes[area:index(pos.x+k*i, pos.y+height+2, pos.z+l)] = c.head_brown_full
+				nodes[area:index(pos.x+l, pos.y+height+2, pos.z+k*i)] = c.head_brown_full
 			end
-			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+o)] = riesenpilz_c_head_brown_full
-			nodes[area:index(pos.x+o, pos.y+height+1, pos.z+l)] = riesenpilz_c_head_brown_full
+			nodes[area:index(pos.x+l, pos.y+height+1, pos.z+o)] = c.head_brown_full
+			nodes[area:index(pos.x+o, pos.y+height+1, pos.z+l)] = c.head_brown_full
 		end
 
 		for m = -1, 1, 2 do
 			for k = 2, 3, 1 do
 				for j = 2, 3, 1 do
-					nodes[area:index(pos.x+j*i, pos.y+height+2, pos.z+k*m)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 7)
+					nodes[area:index(pos.x+j*i, pos.y+height+2, pos.z+k*m)] = ran_node(c.head_yellow, c.head_orange, 7)
 				end
 			end
-			nodes[area:index(pos.x+i, pos.y+height+1, pos.z+m)] = riesenpilz_c_head_brown_full
-			nodes[area:index(pos.x+m*2, pos.y+height+1, pos.z+o)] = riesenpilz_c_head_brown_full
+			nodes[area:index(pos.x+i, pos.y+height+1, pos.z+m)] = c.head_brown_full
+			nodes[area:index(pos.x+m*2, pos.y+height+1, pos.z+o)] = c.head_brown_full
 		end
 
 		for l = -3+1, 3, 1 do
-			nodes[area:index(pos.x+3*i, pos.y+height+5, pos.z-l*i)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 5)
-			nodes[area:index(pos.x+l*i, pos.y+height+5, pos.z+3*i)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 5)
+			nodes[area:index(pos.x+3*i, pos.y+height+5, pos.z-l*i)] = ran_node(c.head_yellow, c.head_orange, 5)
+			nodes[area:index(pos.x+l*i, pos.y+height+5, pos.z+3*i)] = ran_node(c.head_yellow, c.head_orange, 5)
 		end
 
 		for j = 0, 1, 1 do
 			for l = -3, 3, 1 do
-				nodes[area:index(pos.x+i*4, pos.y+height+3+j, pos.z+l)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 6)
-				nodes[area:index(pos.x+l, pos.y+height+3+j, pos.z+i*4)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 6)
+				nodes[area:index(pos.x+i*4, pos.y+height+3+j, pos.z+l)] = ran_node(c.head_yellow, c.head_orange, 6)
+				nodes[area:index(pos.x+l, pos.y+height+3+j, pos.z+i*4)] = ran_node(c.head_yellow, c.head_orange, 6)
 			end
 		end
 
@@ -188,7 +190,7 @@ function riesenpilz_lavashroom(pos)
 
 	for k = -2, 2, 1 do
 		for l = -2, 2, 1 do
-			nodes[area:index(pos.x+k, pos.y+height+6, pos.z+l)] = ran_node(riesenpilz_c_head_yellow, riesenpilz_c_head_orange, 4)
+			nodes[area:index(pos.x+k, pos.y+height+6, pos.z+l)] = ran_node(c.head_yellow, c.head_orange, 4)
 		end
 	end
 
@@ -207,21 +209,21 @@ function riesenpilz_glowshroom(pos)
 	local br = 2
 
 	for i = 0, height, 1 do
-		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_stem_blue
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = c.stem_blue
 	end
 
 	for i = -1, 1, 2 do
 
 		for k = -br, br, 2*br do
 			for l = 2, height, 1 do
-				nodes[area:index(pos.x+i*br, pos.y+l, pos.z+k)] = riesenpilz_c_head_blue
+				nodes[area:index(pos.x+i*br, pos.y+l, pos.z+k)] = c.head_blue
 			end
-			nodes[area:index(pos.x+i*br, pos.y+1, pos.z+k)] = riesenpilz_c_head_blue_bright
+			nodes[area:index(pos.x+i*br, pos.y+1, pos.z+k)] = c.head_blue_bright
 		end
 
 		for l = -br+1, br, 1 do
-			nodes[area:index(pos.x+i*br, pos.y+height, pos.z-l*i)] = riesenpilz_c_head_blue
-			nodes[area:index(pos.x+l*i, pos.y+height, pos.z+br*i)] = riesenpilz_c_head_blue
+			nodes[area:index(pos.x+i*br, pos.y+height, pos.z-l*i)] = c.head_blue
+			nodes[area:index(pos.x+l*i, pos.y+height, pos.z+br*i)] = c.head_blue
 		end
 
 	end
@@ -229,7 +231,7 @@ function riesenpilz_glowshroom(pos)
 	for l = 0, br, 1 do
 		for i = -br+l, br-l, 1 do
 			for k = -br+l, br-l, 1 do
-				nodes[area:index(pos.x+i, pos.y+height+1+l, pos.z+k)] = riesenpilz_c_head_blue
+				nodes[area:index(pos.x+i, pos.y+height+1+l, pos.z+k)] = c.head_blue
 			end
 		end
 	end
@@ -254,12 +256,12 @@ function riesenpilz_parasol(pos)
 
 	--stem
 	for i in area:iterp(pos, {x=pos.x, y=pos.y+height-2, z=pos.z}) do
-		nodes[i] = riesenpilz_c_stem
+		nodes[i] = c.stem
 	end
 
 	for _,j in ipairs({
-		{bhead2, 0, riesenpilz_c_head_brown_bright},
-		{bhead1, -1, riesenpilz_c_head_binge}
+		{bhead2, 0, c.head_brown_bright},
+		{bhead1, -1, c.head_binge}
 	}) do
 		for i in area:iter(pos.x-j[1], pos.y+height+j[2], pos.z-j[1], pos.x+j[1], pos.y+height+j[2], pos.z+j[1]) do
 			nodes[i] = j[3]
@@ -268,16 +270,16 @@ function riesenpilz_parasol(pos)
 
 	for k = -1, 1, 2 do
 		for l = 0, 1 do
-			nodes[area:index(pos.x+k, pos.y+rh, pos.z-l*k)] = riesenpilz_c_head_white
-			nodes[area:index(pos.x+l*k, pos.y+rh, pos.z+k)] = riesenpilz_c_head_white
+			nodes[area:index(pos.x+k, pos.y+rh, pos.z-l*k)] = c.head_white
+			nodes[area:index(pos.x+l*k, pos.y+rh, pos.z+k)] = c.head_white
 		end
 		for l = -br+1, br do
-			nodes[area:index(pos.x+br*k, pos.y+height-2, pos.z-l*k)] = riesenpilz_c_head_binge
-			nodes[area:index(pos.x+l*k, pos.y+height-2, pos.z+br*k)] = riesenpilz_c_head_binge
+			nodes[area:index(pos.x+br*k, pos.y+height-2, pos.z-l*k)] = c.head_binge
+			nodes[area:index(pos.x+l*k, pos.y+height-2, pos.z+br*k)] = c.head_binge
 		end
 		for l = -bhead1+1, bhead1 do
-			nodes[area:index(pos.x+bhead1*k, pos.y+height-2, pos.z-l*k)] = riesenpilz_c_head_white
-			nodes[area:index(pos.x+l*k, pos.y+height-2, pos.z+bhead1*k)] = riesenpilz_c_head_white
+			nodes[area:index(pos.x+bhead1*k, pos.y+height-2, pos.z-l*k)] = c.head_white
+			nodes[area:index(pos.x+l*k, pos.y+height-2, pos.z+bhead1*k)] = c.head_white
 		end
 	end
 
@@ -299,34 +301,34 @@ function riesenpilz_apple(pos)
 	for l = -b, b, 1 do
 		for j = 1, a-1, 1 do
 			for k = -size, size, a do
-				nodes[area:index(pos.x+k, pos.y+j, pos.z+l)] = riesenpilz_c_red
-				nodes[area:index(pos.x+l, pos.y+j, pos.z+k)] = riesenpilz_c_red
+				nodes[area:index(pos.x+k, pos.y+j, pos.z+l)] = c.red
+				nodes[area:index(pos.x+l, pos.y+j, pos.z+k)] = c.red
 			end
 		end
 		for i = -b, b, 1 do
-			nodes[area:index(pos.x+i, pos.y, pos.z+l)] = riesenpilz_c_red
-			nodes[area:index(pos.x+i, pos.y+a, pos.z+l)] = riesenpilz_c_red
+			nodes[area:index(pos.x+i, pos.y, pos.z+l)] = c.red
+			nodes[area:index(pos.x+i, pos.y+a, pos.z+l)] = c.red
 		end
 	end
 
 	for i = a+1, a+b, 1 do
-		nodes[area:index(pos.x, pos.y+i, pos.z)] = riesenpilz_c_tree
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = c.tree
 	end
 
 	local c = pos.y+1
 	for i = -3,1,1 do
-		nodes[area:index(pos.x+i, c, pos.z+1)] = riesenpilz_c_brown
+		nodes[area:index(pos.x+i, c, pos.z+1)] = c.brown
 	end
 	for i = 0,1,1 do
-		nodes[area:index(pos.x+i+1, c, pos.z-1-i)] = riesenpilz_c_brown
-		nodes[area:index(pos.x+i+2, c, pos.z-1-i)] = riesenpilz_c_brown
+		nodes[area:index(pos.x+i+1, c, pos.z-1-i)] = c.brown
+		nodes[area:index(pos.x+i+2, c, pos.z-1-i)] = c.brown
 	end
-	nodes[area:index(pos.x+1, c, pos.z)] = riesenpilz_c_brown
-	nodes[area:index(pos.x-3, c+1, pos.z+1)] = riesenpilz_c_brown
+	nodes[area:index(pos.x+1, c, pos.z)] = c.brown
+	nodes[area:index(pos.x-3, c+1, pos.z+1)] = c.brown
 
 	manip:set_data(nodes)
 	manip:write_to_map()
-	print(string.format("[riesenpilz] an apple grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") after ca. %.2fs", os.clock() - t1))
+	riesenpilz.inform("an apple grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", 3, t1)
 	manip:update_map()
 end
 
@@ -543,33 +545,34 @@ minetest.register_node("riesenpilz:ground", {
 })
 
 
-riesenpilz_c_air = minetest.get_content_id("air")
+c = {
+	air = minetest.get_content_id("air"),
 
-riesenpilz_c_stem = minetest.get_content_id("riesenpilz:stem")
-riesenpilz_c_head_red = minetest.get_content_id("riesenpilz:head_red")
-riesenpilz_c_lamellas = minetest.get_content_id("riesenpilz:lamellas")
+	stem = minetest.get_content_id("riesenpilz:stem"),
+	head_red = minetest.get_content_id("riesenpilz:head_red"),
+	lamellas = minetest.get_content_id("riesenpilz:lamellas"),
 
-riesenpilz_c_head_brown = minetest.get_content_id("riesenpilz:head_brown")
+	head_brown = minetest.get_content_id("riesenpilz:head_brown"),
 
-riesenpilz_c_head_red_side = minetest.get_content_id("riesenpilz:head_red_side")
+	head_red_side = minetest.get_content_id("riesenpilz:head_red_side"),
 
-riesenpilz_c_stem_brown = minetest.get_content_id("riesenpilz:stem_brown")
-riesenpilz_c_head_brown_full = minetest.get_content_id("riesenpilz:head_brown_full")
-riesenpilz_c_head_orange = minetest.get_content_id("riesenpilz:head_orange")
-riesenpilz_c_head_yellow = minetest.get_content_id("riesenpilz:head_yellow")
+	stem_brown = minetest.get_content_id("riesenpilz:stem_brown"),
+	head_brown_full = minetest.get_content_id("riesenpilz:head_brown_full"),
+	head_orange = minetest.get_content_id("riesenpilz:head_orange"),
+	head_yellow = minetest.get_content_id("riesenpilz:head_yellow"),
 
-riesenpilz_c_stem_blue = minetest.get_content_id("riesenpilz:stem_blue")
-riesenpilz_c_head_blue = minetest.get_content_id("riesenpilz:head_blue")
-riesenpilz_c_head_blue_bright = minetest.get_content_id("riesenpilz:head_blue_bright")
+	stem_blue = minetest.get_content_id("riesenpilz:stem_blue"),
+	head_blue = minetest.get_content_id("riesenpilz:head_blue"),
+	head_blue_bright = minetest.get_content_id("riesenpilz:head_blue_bright"),
 
-riesenpilz_c_head_white = minetest.get_content_id("riesenpilz:head_white")
-riesenpilz_c_head_binge = minetest.get_content_id("riesenpilz:head_binge")
-riesenpilz_c_head_brown_bright = minetest.get_content_id("riesenpilz:head_brown_bright")
+	head_white = minetest.get_content_id("riesenpilz:head_white"),
+	head_binge = minetest.get_content_id("riesenpilz:head_binge"),
+	head_brown_bright = minetest.get_content_id("riesenpilz:head_brown_bright"),
 
-riesenpilz_c_red = minetest.get_content_id("default:copperblock")
-riesenpilz_c_brown = minetest.get_content_id("default:desert_stone")
-riesenpilz_c_tree = minetest.get_content_id("default:tree")
-
+	red = minetest.get_content_id("default:copperblock"),
+	brown = minetest.get_content_id("default:desert_stone"),
+	tree = minetest.get_content_id("default:tree"),
+}
 
 
 
@@ -608,4 +611,4 @@ if riesenpilz.enable_mapgen then
 	dofile(minetest.get_modpath("riesenpilz") .. "/mapgen.lua")
 end
 
-print(string.format("[riesenpilz] loaded after ca. %.2fs", os.clock() - load_time_start))
+riesenpilz.inform("loaded", 1, load_time_start)
