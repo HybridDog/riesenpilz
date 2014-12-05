@@ -443,41 +443,94 @@ local mushrooms_list = {
 		description = "brown mushroom",
 		box = BOX.BROWN,
 		growing = {
-			
-		}
+			r = {min=3, max=4},
+			grounds = {soil=1, crumbly=3},
+			neighbours = {"default:tree"},
+			light = {min=1, max=4},
+			interval = 100,
+			chance = 18,
+		},
 	},
 	["red"] = {
 		description = "red mushroom",
-		box = BOX.RED
+		box = BOX.RED,
+		growing = {
+			r = {min=4, max=5},
+			grounds = {soil=2},
+			neighbours = {"default:water_flowing"},
+			light = {min=3, max=10},
+			interval = 50,
+			chance = 30,
+		},
 	},
 	["fly_agaric"] = {
 		description = "fly agaric",
-		box = BOX.FLY_AGARIC
+		box = BOX.FLY_AGARIC,
+		growing = {
+			r = 4,
+			grounds = {soil=1, crumbly=3},
+			neighbours = {"default:pinetree"},
+			light = {min=2, max=7},
+			interval = 101,
+			chance = 30,
+		},
 	},
 	["lavashroom"] = {
 		description = "Lavashroom",
-		box = BOX.LAVASHROOM
+		box = BOX.LAVASHROOM,
+		growing = {
+			r = {min=5, max=6},
+			grounds = {cracky=3},
+			neighbours = {"default:lava_source"},
+			light = {min=10, max=14},
+			interval = 1010,
+			chance = 60,
+		},
 	},
 	["glowshroom"] = {
 		description = "Glowshroom",
-		box = BOX.GLOWSHROOM
+		box = BOX.GLOWSHROOM,
+		growing = {
+			r = 3,
+			grounds = {soil=1, crumbly=3},
+			neighbours = {"default:stone"},
+			light = 0,
+		},
 	},
 	["nether_shroom"] = {
 		description = "Nether mushroom",
 		box = BOX.NETHER_SHROOM,
-		burntime = 6
+		burntime = 6,
 	},
 	["parasol"] = {
 		description = "white parasol mushroom",
-		box = BOX.PARASOL
+		box = BOX.PARASOL,
+		growing = {
+			r = {min=3, max=5},
+			grounds = {soil=1, crumbly=3},
+			neighbours = {"default:pinetree"},
+			light = {min=1, max=7},
+		},
 	},
 	["red45"] = {
 		description = "45 red mushroom",
-		box = BOX.RED45
+		box = BOX.RED45,
+		growing = {
+			r = {min=3, max=4},
+			grounds = {soil=2},
+			neighbours = {"default:water_source"},
+			light = {min=2, max=3},
+		},
 	},
 	["brown45"] = {
 		description = "45 brown mushroom",
-		box = BOX.BROWN45
+		box = BOX.BROWN45,
+		growing = {
+			r = {min=2, max=3},
+			grounds = {tree=1},
+			neighbours = {"default:water_flowing"},
+			light = {min=7, max=11},
+		},
 	},
 }
 

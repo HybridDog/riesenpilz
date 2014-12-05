@@ -42,7 +42,7 @@ local function define_contents()
 end
 
 
-local function find_grond(a,list)
+local function find_ground(a,list)
 	for _,nam in ipairs(list) do			
 		if a == nam then
 			return true
@@ -53,13 +53,13 @@ end
 
 
 function riesenpilz_circle(nam, pos, radius, chance)
-	for i = -radius, radius do
-		for j = -radius, radius do
-			if math.floor(	math.sqrt(i^2+j^2)	+0.5) == radius
-			and data[area:index(pos.x+i, pos.y, pos.z+j)] == c.air
-			and pr:next(1,chance) == 1
-			and data[area:index(pos.x+i, pos.y-1, pos.z+j)] == c.ground then
-				data[area:index(pos.x+i, pos.y, pos.z+j)] = nam
+	for _,p in pairs(vector.circle(radius)) do
+		if pr:next(1,chance) == 1 then
+			local p = vector.add(pos, p)
+			local p_p = area:indexp(p)
+			if data[p_p] == c.air
+			and data[area:index(p.x, p.y-1, p.z)] == c.ground then
+				data[p_p] = nam
 			end
 		end
 	end
@@ -184,7 +184,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local ground_y = nil --Definition des Bodens:
 --				for y=maxp.y,0,-1 do
 				for y=maxp.y,1,-1 do
-					if find_grond(data[area:index(x, y, z)], c.GROUND) then
+					if find_ground(data[area:index(x, y, z)], c.GROUND) then
 						ground_y = y
 						break
 					end
