@@ -53,8 +53,8 @@ end
 
 
 function riesenpilz_circle(nam, pos, radius, chance)
-	for i = -radius, radius, 1 do
-		for j = -radius, radius, 1 do
+	for i = -radius, radius do
+		for j = -radius, radius do
 			if math.floor(	math.sqrt(i^2+j^2)	+0.5) == radius
 			and data[area:index(pos.x+i, pos.y, pos.z+j)] == c.air
 			and pr:next(1,chance) == 1

@@ -371,28 +371,6 @@ minetest.register_node(":default:apple", {
 --Mushroom Nodes
 
 
-local function pilz(name, desc, b, burntime)
-	burntime = burntime or 1
-	local box = {
-		type = "fixed",
-		fixed = b
-	}
-	minetest.register_node("riesenpilz:"..name, {
-		description = desc,
-		tiles = {"riesenpilz_"..name.."_top.png", "riesenpilz_"..name.."_bottom.png", "riesenpilz_"..name.."_side.png"},
-		inventory_image = "riesenpilz_"..name.."_side.png",
-		walkable = false,
-		buildable_to = true,
-		drawtype = "nodebox",
-		paramtype = "light",
-		groups = {snappy=3,flammable=2,attached_node=1},
-		sounds =  default.node_sound_leaves_defaults(),
-		node_box = box,
-		selection_box = box,
-		furnace_burntime = burntime
-	})
-end
-
 local BOX = {
 	RED = {
 		{-1/16, -8/16, -1/16, 1/16, -6/16, 1/16},
@@ -461,19 +439,68 @@ local BOX = {
 
 
 local mushrooms_list = {
-	{"brown", "brown mushroom", BOX.BROWN},
-	{"red", "red mushroom", BOX.RED},
-	{"fly_agaric", "fly agaric", BOX.FLY_AGARIC},
-	{"lavashroom", "Lavashroom", BOX.LAVASHROOM},
-	{"glowshroom", "Glowshroom", BOX.GLOWSHROOM},
-	{"nether_shroom", "Nether mushroom", BOX.NETHER_SHROOM, 6},
-	{"parasol", "white parasol mushroom", BOX.PARASOL},
-	{"red45", "45 red mushroom", BOX.RED45},
-	{"brown45", "45 brown mushroom", BOX.BROWN45},
+	["brown"] = {
+		description = "brown mushroom",
+		box = BOX.BROWN,
+		growing = {
+			
+		}
+	},
+	["red"] = {
+		description = "red mushroom",
+		box = BOX.RED
+	},
+	["fly_agaric"] = {
+		description = "fly agaric",
+		box = BOX.FLY_AGARIC
+	},
+	["lavashroom"] = {
+		description = "Lavashroom",
+		box = BOX.LAVASHROOM
+	},
+	["glowshroom"] = {
+		description = "Glowshroom",
+		box = BOX.GLOWSHROOM
+	},
+	["nether_shroom"] = {
+		description = "Nether mushroom",
+		box = BOX.NETHER_SHROOM,
+		burntime = 6
+	},
+	["parasol"] = {
+		description = "white parasol mushroom",
+		box = BOX.PARASOL
+	},
+	["red45"] = {
+		description = "45 red mushroom",
+		box = BOX.RED45
+	},
+	["brown45"] = {
+		description = "45 brown mushroom",
+		box = BOX.BROWN45
+	},
 }
 
-for _,i in ipairs(mushrooms_list) do
-	pilz(i[1], i[2], i[3], i[4])
+for name,i in pairs(mushrooms_list) do
+	local burntime = i.burntime or 1
+	local box = {
+		type = "fixed",
+		fixed = i.box
+	}
+	minetest.register_node("riesenpilz:"..name, {
+		description = i.description,
+		tiles = {"riesenpilz_"..name.."_top.png", "riesenpilz_"..name.."_bottom.png", "riesenpilz_"..name.."_side.png"},
+		inventory_image = "riesenpilz_"..name.."_side.png",
+		walkable = false,
+		buildable_to = true,
+		drawtype = "nodebox",
+		paramtype = "light",
+		groups = {snappy=3,flammable=2,attached_node=1},
+		sounds =  default.node_sound_leaves_defaults(),
+		node_box = box,
+		selection_box = box,
+		furnace_burntime = burntime
+	})
 end
 
 
