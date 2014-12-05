@@ -461,15 +461,15 @@ local BOX = {
 
 
 local mushrooms_list = {
-	{"brown", "Brown Mushroom", BOX.BROWN},
-	{"red", "Red Mushroom", BOX.RED},
-	{"fly_agaric", "Fly Agaric", BOX.FLY_AGARIC},
+	{"brown", "brown mushroom", BOX.BROWN},
+	{"red", "red mushroom", BOX.RED},
+	{"fly_agaric", "fly agaric", BOX.FLY_AGARIC},
 	{"lavashroom", "Lavashroom", BOX.LAVASHROOM},
 	{"glowshroom", "Glowshroom", BOX.GLOWSHROOM},
-	{"nether_shroom", "Nether Mushroom", BOX.NETHER_SHROOM, 6},
-	{"parasol", "Parasol Mushroom", BOX.PARASOL},
-	{"red45", "45 Brown Mushroom", BOX.RED45},
-	{"brown45", "45 Red Mushroom", BOX.BROWN45},
+	{"nether_shroom", "Nether mushroom", BOX.NETHER_SHROOM, 6},
+	{"parasol", "white parasol mushroom", BOX.PARASOL},
+	{"red45", "45 red mushroom", BOX.RED45},
+	{"brown45", "45 brown mushroom", BOX.BROWN45},
 }
 
 for _,i in ipairs(mushrooms_list) do
@@ -499,25 +499,25 @@ local s = "stem_"
 local rh = r..h
 local rs = r..s
 
-local GS = "Giant Mushroom "
-local GSH = GS.."Head "
-local GSS = GS.."Stem "
+local GS = "giant mushroom "
+local GSH = GS.."head "
+local GSS = GS.."stem "
 
 local pilznode_list = {
-	{"stem", GSS.."Beige", {rs.."top.png", rs.."top.png", "riesenpilz_stem.png"}, "stem"},
-	{s.."brown", GSS.."Brown", {rs.."top.png", rs.."top.png", rs.."brown.png"}, s.."brown"},
-	{s.."blue", GSS.."Blue", {rs.."top.png",rs.."top.png",rs.."blue.png"}, s.."blue"},
-	{"lamellas", "Giant Mushroom Lamella", {"riesenpilz_lamellas.png"}, "lamellas"},
-	{h.."red", GSH.."Red", {"riesenpilz_head.png", "riesenpilz_lamellas.png", "riesenpilz_head.png"}, "red"},
-	{h.."orange", GSH.."Orange", {rh.."orange.png"}, "lavashroom"},
-	{h.."yellow", GSH.."Yellow", {rh.."yellow.png"}, "lavashroom"},
-	{h.."brown", GSH.."Brown", {r.."brown_top.png", r.."lamellas.png", r.."brown_top.png"}, "brown"},
-	{h.."brown_full", GSH.."Full Brown", {r.."brown_top.png"},"brown"},
-	{h.."blue_bright", GSH.."Blue Bright", {rh.."blue_bright.png"},"glowshroom"},
-	{h.."blue", GSH.."Blue", {rh.."blue.png"},"glowshroom"},
-	{h.."white", GSH.."White", {rh.."white.png"},"parasol"},
-	{h.."binge", GSH.."Binge", {rh.."binge.png", rh.."white.png", rh.."binge.png"},"parasol"},
-	{h.."brown_bright", GSH.."Brown Bright", {rh.."brown_bright.png", rh.."white.png", rh.."brown_bright.png"},"parasol"},
+	{"stem", GSS.."beige", {rs.."top.png", rs.."top.png", "riesenpilz_stem.png"}, "stem"},
+	{s.."brown", GSS.."brown", {rs.."top.png", rs.."top.png", rs.."brown.png"}, s.."brown"},
+	{s.."blue", GSS.."blue", {rs.."top.png",rs.."top.png",rs.."blue.png"}, s.."blue"},
+	{"lamellas", "giant mushroom lamella", {"riesenpilz_lamellas.png"}, "lamellas"},
+	{h.."red", GSH.."red", {"riesenpilz_head.png", "riesenpilz_lamellas.png", "riesenpilz_head.png"}, "red"},
+	{h.."orange", GSH.."orange", {rh.."orange.png"}, "lavashroom"},
+	{h.."yellow", GSH.."yellow", {rh.."yellow.png"}, "lavashroom"},
+	{h.."brown", GSH.."brown", {r.."brown_top.png", r.."lamellas.png", r.."brown_top.png"}, "brown"},
+	{h.."brown_full", GSH.."full brown", {r.."brown_top.png"},"brown"},
+	{h.."blue_bright", GSH.."blue bright", {rh.."blue_bright.png"},"glowshroom"},
+	{h.."blue", GSH.."blue", {rh.."blue.png"},"glowshroom"},
+	{h.."white", GSH.."white", {rh.."white.png"},"parasol"},
+	{h.."binge", GSH.."binge", {rh.."binge.png", rh.."white.png", rh.."binge.png"},"parasol"},
+	{h.."brown_bright", GSH.."brown bright", {rh.."brown_bright.png", rh.."white.png", rh.."brown_bright.png"},"parasol"},
 }
 
 for _,i in ipairs(pilznode_list) do
@@ -526,7 +526,7 @@ end
 
 
 minetest.register_node("riesenpilz:head_red_side", {
-	description = "Giant Mushroom Head Side",
+	description = "giant mushroom head red side",
 	tiles = {"riesenpilz_head.png",	"riesenpilz_lamellas.png",	"riesenpilz_head.png",
 					"riesenpilz_head.png",	"riesenpilz_head.png",	"riesenpilz_lamellas.png"},
 	paramtype2 = "facedir",
@@ -537,7 +537,7 @@ minetest.register_node("riesenpilz:head_red_side", {
 })
 
 minetest.register_node("riesenpilz:ground", {
-	description = "Grass?",
+	description = "dirt with rotten grass",
 	tiles = {"riesenpilz_ground_top.png","default_dirt.png","default_dirt.png^riesenpilz_ground_side.png"},
 	groups = {crumbly=3},
 	sounds = default.node_sound_dirt_defaults(),
@@ -580,7 +580,7 @@ c = {
 
 
 minetest.register_tool("riesenpilz:growingtool", {
-	description = "Growingtool",
+	description = "growingtool",
 	inventory_image = "riesenpilz_growingtool.png",
 })
 
