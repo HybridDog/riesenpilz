@@ -447,8 +447,8 @@ local mushrooms_list = {
 			grounds = {soil=1, crumbly=3},
 			neighbours = {"default:tree"},
 			light = {min=1, max=4},
-			interval = 100,
-			chance = 18,
+			interval = 1,--100,
+			chance = 1,--18,
 		},
 	},
 	["red"] = {
@@ -495,6 +495,8 @@ local mushrooms_list = {
 			grounds = {soil=1, crumbly=3},
 			neighbours = {"default:stone"},
 			light = 0,
+			interval = 710,
+			chance = 120,
 		},
 	},
 	["nether_shroom"] = {
@@ -510,6 +512,8 @@ local mushrooms_list = {
 			grounds = {soil=1, crumbly=3},
 			neighbours = {"default:pinetree"},
 			light = {min=1, max=7},
+			interval = 51,
+			chance = 36,
 		},
 	},
 	["red45"] = {
@@ -520,6 +524,8 @@ local mushrooms_list = {
 			grounds = {soil=2},
 			neighbours = {"default:water_source"},
 			light = {min=2, max=3},
+			interval = 1000,
+			chance = 180,
 		},
 	},
 	["brown45"] = {
@@ -530,17 +536,21 @@ local mushrooms_list = {
 			grounds = {tree=1},
 			neighbours = {"default:water_flowing"},
 			light = {min=7, max=11},
+			interval = 100,
+			chance = 20,
 		},
 	},
 }
 
+local abm_allowed = true
 for name,i in pairs(mushrooms_list) do
 	local burntime = i.burntime or 1
 	local box = {
 		type = "fixed",
 		fixed = i.box
 	}
-	minetest.register_node("riesenpilz:"..name, {
+	local nd = "riesenpilz:"..name
+	minetest.register_node(nd, {
 		description = i.description,
 		tiles = {"riesenpilz_"..name.."_top.png", "riesenpilz_"..name.."_bottom.png", "riesenpilz_"..name.."_side.png"},
 		inventory_image = "riesenpilz_"..name.."_side.png",
@@ -554,8 +564,117 @@ for name,i in pairs(mushrooms_list) do
 		selection_box = box,
 		furnace_burntime = burntime
 	})
-end
 
+	local g = i.growing
+
+	if g then
+		local grounds = g.grounds
+		local nds = {}
+		for n in pairs(grounds) do
+			table.insert(nds, "group:"..n)
+		end
+
+		local nbs = table.copy(g.neighbours)
+		table.insert(nbs, "air")
+
+		local r = g.r
+		local rmin, rmax
+		if type(r) == "table" then
+			rmin = r.min
+			rmax = r.max
+		else
+			rmin = r or 3
+			rmax = rmin
+		end
+
+		local l = g.light
+		local lmin, lmax
+		if type(l) == "table" then
+			lmin = l.min
+			lmax = l.max
+		else
+			lmin = l or 3
+			lmax = lmin
+		end
+
+		minetest.register_abm({
+			nodenames = nds,
+			neighbors = g.neighbours,
+			interval = g.interval,
+			chance = g.chance,
+			action = function(pos, node)
+
+			-- don't spawn mushroom circles next to other ones
+				if minetest.find_node_near(pos, rmax, nd) then
+					return
+				end
+
+			-- spawn them around the right nodes
+				local data = minetest.registered_nodes[node.name]
+				if not data
+				or not data.groups then
+					return
+				end
+				local groups = data.groups
+				for n,i in pairs(grounds) do
+					if groups[n] ~= i then
+						return
+					end
+				end
+
+			-- find their neighbours
+				for _,n in pairs(nbs) do
+					if not minetest.find_node_near(pos, rmin, n) then
+						return
+					end
+				end
+
+			-- should disallow lag
+				abm_allowed = false
+				minetest.after(2, function() abm_allowed = true end)
+
+			-- witch circles
+				for _,p in pairs(vector.circle(math.random(rmin, rmax))) do
+					local p = vector.add(pos, p)
+
+				-- currently 3 is used here, approved by its use in the mapgen
+					if math.random(3) == 1 then
+
+					-- don't only use the current y for them
+						for y = 2,0,-1 do
+							local pos = {x=p.x, y=p.y+y, z=p.z}
+							if minetest.get_node(pos).name ~= "air" then
+								break
+							end
+							local f = minetest.get_node({x=p.x, y=p.y+y-1, z=p.z}).name
+							if f ~= "air" then
+
+							-- they grown on walkable, cubic nodes
+								local data = minetest.registered_nodes[f]
+								if data
+								and data.walkable
+								and (not data.drawtype
+									or data.drawtype == "normal"
+								) then
+
+								-- they also need specific light strengths
+									local light = minetest.get_node_light(pos, 0.5)
+									if light >= lmin
+									and light <= lmax then
+										minetest.set_node(pos, {name=nd})
+										print("[riesenpilz] a mushroom grew at "..vector.pos_to_string(pos))
+									end
+								end
+								break
+							end
+						end
+					end
+				end
+				print("[riesenpilz] "..nd.." mushrooms grew at "..minetest.pos_to_string(pos))
+			end
+		})
+	end
+end
 
 
 --Mushroom Blocks
