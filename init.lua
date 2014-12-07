@@ -630,6 +630,9 @@ for name,i in pairs(mushrooms_list) do
 				end
 
 			-- should disallow lag
+				if not abm_allowed then
+					return
+				end
 				abm_allowed = false
 				minetest.after(2, function() abm_allowed = true end)
 
@@ -641,7 +644,7 @@ for name,i in pairs(mushrooms_list) do
 					if math.random(3) == 1 then
 
 					-- don't only use the current y for them
-						for y = 2,0,-1 do
+						for y = 1,-1,-1 do
 							local pos = {x=p.x, y=p.y+y, z=p.z}
 							if minetest.get_node(pos).name ~= "air" then
 								break
