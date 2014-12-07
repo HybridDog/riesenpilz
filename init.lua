@@ -643,9 +643,10 @@ for name,i in pairs(mushrooms_list) do
 			-- should disallow lag
 				abm_allowed = false
 				minetest.after(2, function() abm_allowed = true end)
+				table.insert(disallowed_ps, pos)
 
 			-- witch circles
-				local changes
+				local ps = {}
 				for _,p in pairs(vector.circle(math.random(rmin, rmax))) do
 					local p = vector.add(pos, p)
 
@@ -673,9 +674,7 @@ for name,i in pairs(mushrooms_list) do
 									local light = minetest.get_node_light(pos, 0.5)
 									if light >= lmin
 									and light <= lmax then
-										changes = true
-										minetest.set_node(pos, {name=nd})
-										--print("[riesenpilz] a mushroom grew at "..vector.pos_to_string(pos))
+										table.insert(ps, pos)
 									end
 								end
 								break
@@ -683,10 +682,15 @@ for name,i in pairs(mushrooms_list) do
 						end
 					end
 				end
-				table.insert(disallowed_ps, pos)
-				if changes then
-					print("[riesenpilz] "..nd.." mushrooms grew at "..minetest.pos_to_string(pos))
+				if not ps[1] then
+					return
 				end
+
+			-- place them
+				for _,p in pairs(ps) do
+					minetest.set_node(p, {name=nd})
+				end
+				print("[riesenpilz] "..nd.." mushrooms grew at "..minetest.pos_to_string(pos))
 			end
 		})
 	end
@@ -705,18 +709,6 @@ end)
 
 
 --Mushroom Blocks
-
-
-local function pilznode(name, desc, textures, sapling)
-minetest.register_node("riesenpilz:"..name, {
-	description = desc,
-	tiles = textures,
-	groups = {oddly_breakable_by_hand=3},
-	drop = {max_items = 1,
-		items = {{items = {"riesenpilz:"..sapling},rarity = 20,},
-				{items = {"riesenpilz:"..name},rarity = 1,}}},
-})
-end
 
 
 local r = "riesenpilz_"
@@ -747,7 +739,15 @@ local pilznode_list = {
 }
 
 for _,i in ipairs(pilznode_list) do
-	pilznode(i[1], i[2], i[3], i[4])
+	local name, desc, textures, sapling = unpack(i)
+	minetest.register_node("riesenpilz:"..name, {
+		description = desc,
+		tiles = textures,
+		groups = {oddly_breakable_by_hand=3},
+		drop = {max_items = 1,
+			items = {{items = {"riesenpilz:"..sapling},rarity = 20,},
+					{items = {"riesenpilz:"..name},rarity = 1,}}},
+	})
 end
 
 
