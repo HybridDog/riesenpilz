@@ -447,8 +447,8 @@ local mushrooms_list = {
 			grounds = {soil=1, crumbly=3},
 			neighbours = {"default:tree"},
 			light = {min=1, max=7},
-			interval = 1,--100,
-			chance = 1,--18,
+			interval = 100,
+			chance = 18,
 		},
 	},
 	["red"] = {
