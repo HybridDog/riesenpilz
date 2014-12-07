@@ -7,4 +7,3 @@
 TODO:
 — add giant nethershroom
 — finish supporting the mushrooms mod
-— fix mushroom spawning

@@ -446,7 +446,7 @@ local mushrooms_list = {
 			r = {min=3, max=4},
 			grounds = {soil=1, crumbly=3},
 			neighbours = {"default:tree"},
-			light = {min=1, max=4},
+			light = {min=1, max=7},
 			interval = 1,--100,
 			chance = 1,--18,
 		},
@@ -458,7 +458,7 @@ local mushrooms_list = {
 			r = {min=4, max=5},
 			grounds = {soil=2},
 			neighbours = {"default:water_flowing"},
-			light = {min=3, max=10},
+			light = {min=4, max=13},
 			interval = 50,
 			chance = 30,
 		},
@@ -470,7 +470,7 @@ local mushrooms_list = {
 			r = 4,
 			grounds = {soil=1, crumbly=3},
 			neighbours = {"default:pinetree"},
-			light = {min=2, max=7},
+			light = {min=2, max=10},
 			interval = 101,
 			chance = 30,
 		},
@@ -496,7 +496,7 @@ local mushrooms_list = {
 			neighbours = {"default:stone"},
 			light = 0,
 			interval = 710,
-			chance = 120,
+			chance = 320,
 		},
 	},
 	["nether_shroom"] = {
@@ -511,7 +511,7 @@ local mushrooms_list = {
 			r = {min=3, max=5},
 			grounds = {soil=1, crumbly=3},
 			neighbours = {"default:pinetree"},
-			light = {min=1, max=7},
+			light = {min=1, max=11},
 			interval = 51,
 			chance = 36,
 		},
@@ -523,7 +523,7 @@ local mushrooms_list = {
 			r = {min=3, max=4},
 			grounds = {soil=2},
 			neighbours = {"default:water_source"},
-			light = {min=2, max=3},
+			light = {min=2, max=7},
 			interval = 1000,
 			chance = 180,
 		},
@@ -543,6 +543,7 @@ local mushrooms_list = {
 }
 
 local abm_allowed = true
+local disallowed_ps = {}
 for name,i in pairs(mushrooms_list) do
 	local burntime = i.burntime or 1
 	local box = {
@@ -577,8 +578,9 @@ for name,i in pairs(mushrooms_list) do
 		local nbs = table.copy(g.neighbours)
 		table.insert(nbs, "air")
 
+		local rmin, rmax, lmin, lmax
+
 		local r = g.r
-		local rmin, rmax
 		if type(r) == "table" then
 			rmin = r.min
 			rmax = r.max
@@ -588,7 +590,6 @@ for name,i in pairs(mushrooms_list) do
 		end
 
 		local l = g.light
-		local lmin, lmax
 		if type(l) == "table" then
 			lmin = l.min
 			lmax = l.max
@@ -603,6 +604,16 @@ for name,i in pairs(mushrooms_list) do
 			interval = g.interval,
 			chance = g.chance,
 			action = function(pos, node)
+				if not abm_allowed then
+					return
+				end
+
+			-- don't try to spawn them on the same positions again
+				for _,p in pairs(disallowed_ps) do
+					if vector.equals(p, pos) then
+						return
+					end
+				end
 
 			-- don't spawn mushroom circles next to other ones
 				if minetest.find_node_near(pos, rmax, nd) then
@@ -630,13 +641,11 @@ for name,i in pairs(mushrooms_list) do
 				end
 
 			-- should disallow lag
-				if not abm_allowed then
-					return
-				end
 				abm_allowed = false
 				minetest.after(2, function() abm_allowed = true end)
 
 			-- witch circles
+				local changes
 				for _,p in pairs(vector.circle(math.random(rmin, rmax))) do
 					local p = vector.add(pos, p)
 
@@ -664,8 +673,9 @@ for name,i in pairs(mushrooms_list) do
 									local light = minetest.get_node_light(pos, 0.5)
 									if light >= lmin
 									and light <= lmax then
+										changes = true
 										minetest.set_node(pos, {name=nd})
-										print("[riesenpilz] a mushroom grew at "..vector.pos_to_string(pos))
+										--print("[riesenpilz] a mushroom grew at "..vector.pos_to_string(pos))
 									end
 								end
 								break
@@ -673,11 +683,25 @@ for name,i in pairs(mushrooms_list) do
 						end
 					end
 				end
-				print("[riesenpilz] "..nd.." mushrooms grew at "..minetest.pos_to_string(pos))
+				table.insert(disallowed_ps, pos)
+				if changes then
+					print("[riesenpilz] "..nd.." mushrooms grew at "..minetest.pos_to_string(pos))
+				end
 			end
 		})
 	end
 end
+
+-- disallow abms when the server is lagging
+minetest.register_globalstep(function(dtime)
+	if dtime > 0.5
+	and abm_allowed then
+		abm_allowed = false
+		minetest.after(2, function() abm_allowed = true end)
+		--minetest.chat_send_all(dtime)
+	end
+end)
+
 
 
 --Mushroom Blocks
