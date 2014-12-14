@@ -13,13 +13,16 @@ local function r_area(manip, width, height, pos)
 	return VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
 end
 
+riesenpilz.vm_update = true
 local function set_vm_data(manip, nodes, pos, t1, name)
 	manip:set_data(nodes)
 	manip:write_to_map()
 	riesenpilz.inform("a "..name.." mushroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", 3, t1)
-	local t1 = os.clock()
-	manip:update_map()
-	riesenpilz.inform("map updated", 3, t1)
+	if riesenpilz.vm_update then
+		local t1 = os.clock()
+		manip:update_map()
+		riesenpilz.inform("map updated", 3, t1)
+	end
 end
 
 --Growing Functions

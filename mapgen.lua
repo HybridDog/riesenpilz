@@ -52,6 +52,18 @@ local function find_ground(a,list)
 end
 
 
+local function fix_light(minp, maxp)
+	local manip = minetest.get_voxel_manip()
+	local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	local nodes = manip:get_data()
+
+	manip:set_data(nodes)
+	manip:write_to_map()
+	manip:update_map()
+end
+
+local data, area
 function riesenpilz_circle(nam, pos, radius, chance)
 	for _,p in pairs(vector.circle(radius)) do
 		if pr:next(1,chance) == 1 then
@@ -94,9 +106,25 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local env = minetest.env	--Should make things a bit faster.
 	local perlin1 = env:get_perlin(51,3, 0.5, perlin_scale)	--Get map specific perlin
 
+	if not riesenpilz.always_generate then
+		local biome_allowed
+		for x = x0, x1, 16 do
+			for z = z0, z1, 16 do
+				if perlin1:get2d({x=x, y=z}) > nosmooth_rarity then
+					biome_allowed = true
+					break
+				end
+			end
+		end
+		if not biome_allowed then
+			return
+		end
+	end
+
 	--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
 	and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
-	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
+	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then
+
 	if not riesenpilz.always_generate
 	and not ( perlin1:get2d( {x=x0, y=z0} ) > nosmooth_rarity ) 					--top left
 	and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > nosmooth_rarity )--top middle
@@ -108,7 +136,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > nosmooth_rarity) 			--middle
 	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > nosmooth_rarity) then		--bottom middle
 		return
-	end
+	end]]
 
 	local t1 = os.clock()
 	riesenpilz.inform("tries to generate a giant mushroom biome at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]", 2)
@@ -251,10 +279,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 	vm:set_data(data)
-	vm:update_liquids()
 	vm:write_to_map()
 	riesenpilz.inform("ground finished", 2, t1)
+
 	local t2 = os.clock()
+	local single_map_update = #tab > 3
+	if single_map_update then
+		riesenpilz.vm_update = false
+	end
 	for _,v in pairs(tab) do
 		local p = v[2]
 		local m = v[1]
@@ -270,7 +302,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			riesenpilz_parasol(p)
 		end
 	end
+	if single_map_update then
+		riesenpilz.vm_update = true
+		fix_light(minp, maxp)
+	end
 	riesenpilz.inform("giant shrooms generated", 2, t2)
+
 	riesenpilz.inform("done", 1, t1)
 end)
 --[[	if maxp.y < -10 then
