@@ -25,6 +25,7 @@ local function set_vm_data(manip, nodes, pos, t1, name)
 	end
 end
 
+
 --Growing Functions
 
 local c
@@ -112,7 +113,7 @@ function riesenpilz_minecraft_fliegenpilz(pos)
 		end
 		for l = 1, height do
 			local y = pos.y+l
-			for _,p in ipairs({
+			for _,p in pairs({
 				{area:index(pos.x+j, y, pos.z+2), 0},
 				{area:index(pos.x+j, y, pos.z-2), 2},
 				{area:index(pos.x+2, y, pos.z+j), 1},
@@ -262,7 +263,7 @@ function riesenpilz_parasol(pos)
 		nodes[i] = c.stem
 	end
 
-	for _,j in ipairs({
+	for _,j in pairs({
 		{bhead2, 0, c.head_brown_bright},
 		{bhead1, -1, c.head_binge}
 	}) do
@@ -701,45 +702,133 @@ end)
 --Mushroom Blocks
 
 
-local r = "riesenpilz_"
-local h = "head_"
-local s = "stem_"
-local rh = r..h
-local rs = r..s
-
-local GS = "giant mushroom "
-local GSH = GS.."head "
-local GSS = GS.."stem "
-
 local pilznode_list = {
-	{"stem", GSS.."beige", {rs.."top.png", rs.."top.png", "riesenpilz_stem.png"}, "stem"},
-	{s.."brown", GSS.."brown", {rs.."top.png", rs.."top.png", rs.."brown.png"}, s.."brown"},
-	{s.."blue", GSS.."blue", {rs.."top.png",rs.."top.png",rs.."blue.png"}, s.."blue"},
-	{"lamellas", "giant mushroom lamella", {"riesenpilz_lamellas.png"}, "lamellas"},
-	{h.."red", GSH.."red", {"riesenpilz_head.png", "riesenpilz_lamellas.png", "riesenpilz_head.png"}, "red"},
-	{h.."orange", GSH.."orange", {rh.."orange.png"}, "lavashroom"},
-	{h.."yellow", GSH.."yellow", {rh.."yellow.png"}, "lavashroom"},
-	{h.."brown", GSH.."brown", {r.."brown_top.png", r.."lamellas.png", r.."brown_top.png"}, "brown"},
-	{h.."brown_full", GSH.."full brown", {r.."brown_top.png"},"brown"},
-	{h.."blue_bright", GSH.."blue bright", {rh.."blue_bright.png"},"glowshroom"},
-	{h.."blue", GSH.."blue", {rh.."blue.png"},"glowshroom"},
-	{h.."white", GSH.."white", {rh.."white.png"},"parasol"},
-	{h.."binge", GSH.."binge", {rh.."binge.png", rh.."white.png", rh.."binge.png"},"parasol"},
-	{h.."brown_bright", GSH.."brown bright", {rh.."brown_bright.png", rh.."white.png", rh.."brown_bright.png"},"parasol"},
+	{
+		typ = "stem",
+		description = "white",
+		textures = {"stem_top.png", "stem_top.png", "stem_white.png"},
+	},
+	{
+		typ = "stem",
+		name = "brown",
+		textures = {"stem_top.png", "stem_top.png", "stem_brown.png"},
+	},
+	{
+		typ = "stem",
+		name = "blue",
+		textures = {"stem_top.png","stem_top.png","stem_blue.png"},
+	},
+	{
+		name = "lamellas",
+		description = "giant mushroom lamella",
+		textures = "lamellas.png",
+		sapling = "lamellas"
+	},
+	{
+		typ = "head",
+		name = "red",
+		textures = {"head.png", "lamellas.png", "head.png"},
+		sapling = "red"
+	},
+	{
+		typ = "head",
+		name = "orange",
+		textures = "head_orange.png",
+		sapling = "lavashroom"
+	},
+	{
+		typ = "head",
+		name = "yellow",
+		textures = "head_yellow.png",
+		sapling = "lavashroom"
+	},
+	{
+		typ = "head",
+		name = "brown",
+		textures = {"brown_top.png", "lamellas.png", "brown_top.png"},
+		sapling = "brown"
+	},
+	{
+		typ = "head",
+		name = "brown_full",
+		description = "full brown",
+		textures = "brown_top.png",
+		sapling = "brown"
+	},
+	{
+		typ = "head",
+		name = "blue_bright",
+		description = "blue bright",
+		textures = "head_blue_bright.png",
+		sapling = "glowshroom"
+	},
+	{
+		typ = "head",
+		name = "blue",
+		textures = "head_blue.png",
+		sapling = "glowshroom"
+	},
+	{
+		typ = "head",
+		name = "white",
+		textures = "head_white.png",
+		sapling = "parasol"
+	},
+	{
+		typ = "head",
+		name = "binge",
+		textures = {"head_binge.png", "head_white.png", "head_binge.png"},
+		sapling = "parasol"
+	},
+	{
+		typ = "head",
+		name = "brown_bright",
+		description = "brown bright",
+		textures = {"head_brown_bright.png", "head_white.png", "head_brown_bright.png"},
+		sapling = "parasol"
+	},
 }
 
-for _,i in ipairs(pilznode_list) do
-	local name, desc, textures, sapling = unpack(i)
-	minetest.register_node("riesenpilz:"..name, {
-		description = desc,
+for _,i in pairs(pilznode_list) do
+	-- fill missing stuff
+	local textures = i.textures
+	i.description = i.description or i.name
+	if type(textures) == "string" then
+		textures = {textures}
+	end
+	for i = 1,#textures do
+		textures[i] = "riesenpilz_"..textures[i]
+	end
+	local nodename = "riesenpilz:"
+	local desctiption,sounds = "giant mushroom "
+	if i.typ == "stem" then
+		desctiption = desctiption.."stem "..i.description
+		nodename = nodename.."stem"..((i.name and "_"..i.name) or "")
+		sounds = default.node_sound_wood_defaults({
+			footstep = {name="riesenpilz_stem", gain=0.2},
+			place = {name="default_place_node", gain=0.8},
+			dig = {name="riesenpilz_stem", gain=0.4},
+			dug = {name="default_wood_footstep", gain=0.3}
+		})
+	elseif i.typ == "head" then
+		desctiption = desctiption.."head "..i.description
+		nodename = nodename.."head_"..i.name
+	else
+		nodename = nodename..i.name
+		desctiption = desctiption..i.description
+	end
+	local drop = i.sapling and {max_items = 1, items = {
+		{items = {"riesenpilz:"..i.sapling}, rarity = 20},
+		{items = {nodename}, rarity = 1}
+	}}
+	minetest.register_node(nodename, {
+		description = desctiption,
 		tiles = textures,
 		groups = {oddly_breakable_by_hand=3},
-		drop = {max_items = 1,
-			items = {{items = {"riesenpilz:"..sapling},rarity = 20,},
-					{items = {"riesenpilz:"..name},rarity = 1,}}},
+		drop = drop,
+		sounds = sounds,
 	})
 end
-
 
 minetest.register_node("riesenpilz:head_red_side", {
 	description = "giant mushroom head red side",
@@ -751,6 +840,8 @@ minetest.register_node("riesenpilz:head_red_side", {
 		items = {{items = {"riesenpilz:fly_agaric"},rarity = 20,},
 				{items = {"riesenpilz:head_red"},rarity = 1,}}},
 })
+
+
 
 minetest.register_node("riesenpilz:ground", {
 	description = "dirt with rotten grass",
