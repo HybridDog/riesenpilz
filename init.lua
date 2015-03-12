@@ -341,16 +341,9 @@ end
 --3D apple [3apple]
 
 
-local tmp = minetest.registered_nodes["default:apple"]
-minetest.register_node(":default:apple", {
-	description = tmp.description,
+minetest.override_item("default:apple", {
 	drawtype = "nodebox",
-	visual_scale = tmp.visual_scale,
 	tiles = {"3apple_apple_top.png","3apple_apple_bottom.png","3apple_apple.png"},
-	inventory_image = tmp.inventory_image,
-	sunlight_propagates = tmp.sunlight_propagates,
-	walkable = tmp.walkable,
-	paramtype = tmp.paramtype,
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -364,10 +357,6 @@ minetest.register_node(":default:apple", {
 			{-1.5/16,	1/16,	.5/16,	0.5/16,		1.2/16,	2.5/16},
 		}
 	},
-	groups = tmp.groups,
-	on_use = tmp.on_use,
-	sounds = tmp.sounds,
-	after_place_node = tmp.after_place_node,
 })
 
 
