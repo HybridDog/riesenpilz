@@ -778,6 +778,13 @@ local pilznode_list = {
 	},
 }
 
+local head_sounds = default.node_sound_wood_defaults({
+	footstep = {name="riesenpilz_head", gain=0.1},
+	place = {name="default_place_node", gain=0.5},
+	dig = {name="riesenpilz_head", gain=0.2},
+	dug = {name="riesenpilz_stem", gain=0.1}
+})
+
 for _,i in pairs(pilznode_list) do
 	-- fill missing stuff
 	local textures = i.textures
@@ -795,13 +802,14 @@ for _,i in pairs(pilznode_list) do
 		nodename = nodename.."stem"..((i.name and "_"..i.name) or "")
 		sounds = default.node_sound_wood_defaults({
 			footstep = {name="riesenpilz_stem", gain=0.2},
-			place = {name="default_place_node", gain=0.8},
+			place = {name="default_place_node", gain=0.5},
 			dig = {name="riesenpilz_stem", gain=0.4},
 			dug = {name="default_wood_footstep", gain=0.3}
 		})
 	elseif i.typ == "head" then
 		desctiption = desctiption.."head "..i.description
 		nodename = nodename.."head_"..i.name
+		sounds = head_sounds
 	else
 		nodename = nodename..i.name
 		desctiption = desctiption..i.description
@@ -827,7 +835,8 @@ minetest.register_node("riesenpilz:head_red_side", {
 	groups = {oddly_breakable_by_hand=3},
 	drop = {max_items = 1,
 		items = {{items = {"riesenpilz:fly_agaric"},rarity = 20,},
-				{items = {"riesenpilz:head_red"},rarity = 1,}}},
+		{items = {"riesenpilz:head_red"},rarity = 1,}}},
+	sounds = head_sounds
 })
 
 
