@@ -821,7 +821,7 @@ for _,i in pairs(pilznode_list) do
 	minetest.register_node(nodename, {
 		description = desctiption,
 		tiles = textures,
-		groups = {oddly_breakable_by_hand=3},
+		groups = {oddly_breakable_by_hand=3, fall_damage_add_percent=-80},
 		drop = drop,
 		sounds = sounds,
 	})
@@ -832,7 +832,7 @@ minetest.register_node("riesenpilz:head_red_side", {
 	tiles = {"riesenpilz_head.png",	"riesenpilz_lamellas.png",	"riesenpilz_head.png",
 					"riesenpilz_head.png",	"riesenpilz_head.png",	"riesenpilz_lamellas.png"},
 	paramtype2 = "facedir",
-	groups = {oddly_breakable_by_hand=3},
+	groups = {oddly_breakable_by_hand=3, fall_damage_add_percent=-80},
 	drop = {max_items = 1,
 		items = {{items = {"riesenpilz:fly_agaric"},rarity = 20,},
 		{items = {"riesenpilz:head_red"},rarity = 1,}}},
