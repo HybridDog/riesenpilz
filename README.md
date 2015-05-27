@@ -10,6 +10,5 @@ If you got ideas or found bugs, please tell them to me.
 
 
 TODO:  
-— add giant nethershroom  
-— finish supporting the mushrooms mod  
-— find out why the mapgen doesn't work correctly
+— add more giant mushrooms  
+— finish supporting the mushrooms mod
