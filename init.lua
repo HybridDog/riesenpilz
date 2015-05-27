@@ -13,16 +13,13 @@ local function r_area(manip, width, height, pos)
 	return VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
 end
 
-riesenpilz.vm_update = true
 local function set_vm_data(manip, nodes, pos, t1, name)
 	manip:set_data(nodes)
 	manip:write_to_map()
 	riesenpilz.inform("a "..name.." mushroom grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", 3, t1)
-	if riesenpilz.vm_update then
-		local t1 = os.clock()
-		manip:update_map()
-		riesenpilz.inform("map updated", 3, t1)
-	end
+	local t1 = os.clock()
+	manip:update_map()
+	riesenpilz.inform("map updated", 3, t1)
 end
 
 
@@ -54,7 +51,7 @@ function riesenpilz.red(pos, nodes, area, w)
 	end
 end
 
-function riesenpilz_hybridpilz(pos)
+local function riesenpilz_hybridpilz(pos)
 	local t1 = os.clock()
 
 	local w = math.random(MAX_SIZE)
@@ -89,7 +86,7 @@ function riesenpilz.brown(pos, nodes, area, br)
 	end
 end
 
-function riesenpilz_brauner_minecraftpilz(pos)
+local function riesenpilz_brauner_minecraftpilz(pos)
 	local t1 = os.clock()
 
 	local br = math.random(MAX_SIZE-1)+1
@@ -131,7 +128,7 @@ function riesenpilz.fly_agaric(pos, nodes, area, param2s)
 	end
 end
 
-function riesenpilz_minecraft_fliegenpilz(pos)
+local function riesenpilz_minecraft_fliegenpilz(pos)
 	local t1 = os.clock()
 
 	local manip = minetest.get_voxel_manip()
@@ -210,7 +207,7 @@ function riesenpilz.lavashroom(pos, nodes, area, h)
 	end
 end
 
-function riesenpilz_lavashroom(pos)
+local function riesenpilz_lavashroom(pos)
 	local t1 = os.clock()
 
 	local h = 3+math.random(MAX_SIZE-2)
@@ -259,7 +256,7 @@ function riesenpilz.glowshroom(pos, nodes, area, h)
 
 end
 
-function riesenpilz_glowshroom(pos)
+local function riesenpilz_glowshroom(pos)
 	local t1 = os.clock()
 
 	local h = 2+math.random(MAX_SIZE)
@@ -312,7 +309,7 @@ function riesenpilz.parasol(pos, nodes, area, w, h)
 	end
 end
 
-function riesenpilz_parasol(pos)
+local function riesenpilz_parasol(pos)
 	local t1 = os.clock()
 
 	local w = math.random(MAX_SIZE+1,MAX_SIZE+2)
@@ -362,7 +359,7 @@ function riesenpilz.apple(pos, nodes, area)
 	nodes[area:index(pos.x-3, c+1, pos.z+1)] = c.brown
 end
 
-function riesenpilz_apple(pos)
+local function riesenpilz_apple(pos)
 
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
