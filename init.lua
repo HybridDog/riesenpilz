@@ -427,7 +427,7 @@ local mushrooms_list = {
 			r = {min=5, max=6},
 			grounds = {cracky=3},
 			neighbours = {"default:lava_source"},
-			light = {min=10, max=14},
+			light = {min=10, max=12},
 			interval = 1010,
 			chance = 60,
 		},
