@@ -106,6 +106,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					break
 				end
 			end
+			if biome_allowed then
+				break
+			end
 		end
 		if not biome_allowed then
 			return
@@ -189,21 +192,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			if in_biome then
 
-				for b = minp.y,maxp.y,1 do	--remove usual stuff
-					local p_pos = area:index(x, b, z)
-					local d_p_pos = data[p_pos]
-					for _,nam in ipairs(c.USUAL_STUFF) do			
-						if d_p_pos == nam then
-							data[p_pos] = c.air
-							break
-						end
-					end
-				end
-
 				local ground_y = nil --Definition des Bodens:
 --				for y=maxp.y,0,-1 do
 				for y=maxp.y,1,-1 do
-					if find_ground(data[area:index(x, y, z)], c.GROUND) then
+					local p_pos = area:index(x, y, z)
+					local d_p_pos = data[p_pos]
+					for _,nam in pairs(c.USUAL_STUFF) do --remove usual stuff
+						if d_p_pos == nam then
+							data[p_pos] = c.air
+							p_pos = nil
+							break
+						end
+					end
+					if p_pos --else search ground_y
+					and find_ground(d_p_pos, c.GROUND) then
 						ground_y = y
 						break
 					end
