@@ -151,7 +151,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
 		local d_p_pos = data[p_pos]
-		for _,nam in ipairs(c.TREE_STUFF) do			
+		for _,nam in ipairs(c.TREE_STUFF) do
 			if d_p_pos == nam then
 				data[p_pos] = c.air
 				break

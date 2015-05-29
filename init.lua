@@ -134,7 +134,7 @@ local function riesenpilz_minecraft_fliegenpilz(pos)
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, 2, 4, pos)
 	local nodes = manip:get_data()
-	local param2s = manip:get_param2_data() 
+	local param2s = manip:get_param2_data()
 
 	riesenpilz.fly_agaric(pos, nodes, area, param2s)
 
