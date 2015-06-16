@@ -5,6 +5,9 @@ riesenpilz = {}
 dofile(minetest.get_modpath("riesenpilz").."/settings.lua")
 dofile(minetest.get_modpath("riesenpilz").."/functions.lua")
 
+
+--Growing Functions
+
 local function r_area(manip, width, height, pos)
 	local emerged_pos1, emerged_pos2 = manip:read_from_map(
 		{x=pos.x-width, y=pos.y, z=pos.z-width},
@@ -22,8 +25,6 @@ local function set_vm_data(manip, nodes, pos, t1, name)
 	riesenpilz.inform("map updated", 3, t1)
 end
 
-
---Growing Functions
 
 local c
 
@@ -680,19 +681,29 @@ for name,i in pairs(mushrooms_list) do
 							local f = minetest.get_node({x=p.x, y=p.y+y-1, z=p.z}).name
 							if f ~= "air" then
 
-							-- they grown on walkable, cubic nodes
+							-- they grown on specific nodes
 								local data = minetest.registered_nodes[f]
 								if data
 								and data.walkable
+								and data.groups
 								and (not data.drawtype
 									or data.drawtype == "normal"
 								) then
+									local ground_disallowed
+									for n,i in pairs(grounds) do
+										if data.groups[n] ~= i then
+											ground_disallowed = true
+											break
+										end
+									end
+									if not ground_disallowed then
 
-								-- they also need specific light strengths
-									local light = minetest.get_node_light(pos, 0.5)
-									if light >= lmin
-									and light <= lmax then
-										table.insert(ps, pos)
+									-- they also need specific light strengths
+										local light = minetest.get_node_light(pos, 0.5)
+										if light >= lmin
+										and light <= lmax then
+											table.insert(ps, pos)
+										end
 									end
 								end
 								break
@@ -726,7 +737,7 @@ end)
 
 
 
---Mushroom Blocks
+--Mushroom Nodes
 
 
 local pilznode_list = {
