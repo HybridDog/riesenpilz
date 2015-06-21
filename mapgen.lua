@@ -74,15 +74,25 @@ local function say_info(info)
 	minetest.chat_send_all(info)
 end
 
-local riesenpilz_rarity = riesenpilz.mapgen_rarity
-local riesenpilz_size = riesenpilz.mapgen_size
-local smooth_trans_size = riesenpilz.smooth_trans_size
+-- perlin noise "hills" are not peaks but looking like sinus curve
+local function upper_rarity(rarity)
+	return math.sign(rarity)*math.sin(math.abs(rarity)*math.pi/2)
+end
 
-local nosmooth_rarity = 1-riesenpilz_rarity/50
-local perlin_scale = riesenpilz_size*100/riesenpilz_rarity
-local smooth_rarity_max = nosmooth_rarity+smooth_trans_size*2/perlin_scale
-local smooth_rarity_min = nosmooth_rarity-smooth_trans_size/perlin_scale
-local smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
+local rarity = riesenpilz.mapgen_rarity
+local riesenpilz_size = riesenpilz.mapgen_size
+
+local nosmooth_rarity = 1-rarity/50
+local perlin_scale = riesenpilz_size*100/rarity
+local smooth_rarity_max, smooth_rarity_min, smooth_rarity_dif
+local smooth = riesenpilz.smooth
+if smooth then
+	local smooth_trans_size = riesenpilz.smooth_trans_size
+	smooth_rarity_max = upper_rarity(nosmooth_rarity+smooth_trans_size*2/perlin_scale)
+	smooth_rarity_min = upper_rarity(nosmooth_rarity-smooth_trans_size/perlin_scale)
+	smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
+end
+nosmooth_rarity = upper_rarity(nosmooth_rarity)
 
 --local USUAL_STUFF =	{"default:leaves","default:apple","default:tree","default:cactus","default:papyrus"}
 
@@ -114,23 +124,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			return
 		end
 	end
-
-	--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
-	and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
-	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then
-
-	if not riesenpilz.always_generate
-	and not ( perlin1:get2d( {x=x0, y=z0} ) > nosmooth_rarity ) 					--top left
-	and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > nosmooth_rarity )--top middle
-	and not (perlin1:get2d({x=x1, y=z1}) > nosmooth_rarity) 						--bottom right
-	and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > nosmooth_rarity) 			--right middle
-	and not (perlin1:get2d({x=x0, y=z1}) > nosmooth_rarity)  						--bottom left
-	and not (perlin1:get2d({x=x1, y=z0}) > nosmooth_rarity)						--top right
-	and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > nosmooth_rarity) 			--left middle
-	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > nosmooth_rarity) 			--middle
-	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > nosmooth_rarity) then		--bottom middle
-		return
-	end]]
 
 	local t1 = os.clock()
 	riesenpilz.inform("tries to generate a giant mushroom biome at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]", 2)
@@ -164,9 +157,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			env:remove_node(v)
 		end]]
 
-
-	local smooth = riesenpilz.smooth
-
 	for j=0,divs do
 		for i=0,divs do
 			local x,z = x0+i,z0+j
@@ -185,29 +175,40 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				) then
 					in_biome = true
 				end
-			elseif (not smooth)
-			and test > nosmooth_rarity then
+			elseif test > nosmooth_rarity then
 				in_biome = true
 			end
 
 			if in_biome then
 
-				local ground_y = nil --Definition des Bodens:
---				for y=maxp.y,0,-1 do
-				for y=maxp.y,1,-1 do
-					local p_pos = area:index(x, y, z)
-					local d_p_pos = data[p_pos]
-					for _,nam in pairs(c.USUAL_STUFF) do --remove usual stuff
-						if d_p_pos == nam then
-							data[p_pos] = c.air
-							p_pos = nil
+				local ymin = math.max(1, minp.y) -- -1
+
+				-- skip the air part
+				local ground
+				for y = maxp.y,ymin,-1 do
+					if data[area:index(x, y, z)] ~= c.air then
+						ground = y
+						break
+					end
+				end
+
+				local ground_y
+				if ground then
+					for y = ground,ymin,-1 do
+						local p_pos = area:index(x, y, z)
+						local d_p_pos = data[p_pos]
+						for _,nam in pairs(c.USUAL_STUFF) do --remove usual stuff
+							if d_p_pos == nam then
+								data[p_pos] = c.air
+								p_pos = nil
+								break
+							end
+						end
+						if p_pos --else search ground_y
+						and find_ground(d_p_pos, c.GROUND) then
+							ground_y = y
 							break
 						end
-					end
-					if p_pos --else search ground_y
-					and find_ground(d_p_pos, c.GROUND) then
-						ground_y = y
-						break
 					end
 				end
 				if ground_y then
@@ -289,49 +290,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:set_lighting({day=0, night=0})
 	vm:calc_lighting()
 	vm:write_to_map()
+	data = nil
+	area = nil
 	riesenpilz.inform("data set", 2, t2)
 
 	riesenpilz.inform("done", 1, t1)
 end)
---[[	if maxp.y < -10 then
-		local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
-		local env = minetest.env	--Should make things a bit faster.
-		local perlin1 = env:get_perlin(11,3, 0.5, 200)	--Get map specific perlin
-
-		--[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
-		and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
-		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]
-		if not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
-		and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > 0.53 )--top middle
-		and not (perlin1:get2d({x=x1, y=z1}) > 0.53) 						--bottom right
-		and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > 0.53) 			--right middle
-		and not (perlin1:get2d({x=x0, y=z1}) > 0.53)  						--bottom left
-		and not (perlin1:get2d({x=x1, y=z0}) > 0.53)						--top right
-		and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > 0.53) 			--left middle
-		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) 			--middle
-		and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > 0.53) then		--bottom middle
-			print("abortriesenpilz")
-			return
-		end
-		local divs = (maxp.x-minp.x);
-		local pr = PseudoRandom(seed+68)
-
-		for j=0,divs do
-			for i=0,divs do
-				local x,z = x0+i,z0+j
-
-				for y=minp.y,maxp.y,1 do
-					local pos = {x=x, y=y, z=z}
-
-					if env:get_node(pos).name == "air"
-					and env:get_node({x=x, y=y-1, z=z}).name == "default:stone"
-					and pr:next(1,40) == 33
-					and env:find_node_near(pos, 4, "group:igniter")
-					and not env:find_node_near(pos, 3, "group:igniter") then
-						env:add_node(pos, {name="riesenpilz:lavashroom"})
-					end
-				end
-			end
-		end
-	end
-end)]]

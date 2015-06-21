@@ -9,10 +9,10 @@ riesenpilz.always_generate = false
 riesenpilz.smooth = true
 
 --rarity in %
-riesenpilz.mapgen_rarity = 0.1
+riesenpilz.mapgen_rarity = 0.4
 
 --size of the generated... (has an effect to the rarity, too)
-riesenpilz.mapgen_size = 50
+riesenpilz.mapgen_size = 200
 
 --approximate size of smooth transitions
 riesenpilz.smooth_trans_size = 2
