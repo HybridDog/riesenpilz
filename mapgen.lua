@@ -211,6 +211,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 					end
 				end
+
 				if ground_y then
 					data[area:index(x, ground_y, z)] = c.ground
 					for i = -1,-5,-1 do
