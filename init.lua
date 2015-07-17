@@ -892,7 +892,9 @@ minetest.register_node("riesenpilz:head_red_side", {
 
 minetest.register_node("riesenpilz:ground", {
 	description = "dirt with rotten grass",
-	tiles = {"riesenpilz_ground_top.png","default_dirt.png","default_dirt.png^riesenpilz_ground_side.png"},
+	tiles = {"riesenpilz_ground_top.png","default_dirt.png",
+		{name="default_dirt.png^riesenpilz_ground_side.png", tileable_vertical = false}
+	},
 	groups = {crumbly=3},
 	sounds = default.node_sound_dirt_defaults(),
 	drop = 'default:dirt'
