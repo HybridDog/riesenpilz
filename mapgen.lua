@@ -138,6 +138,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local tab = {}
 	pr = PseudoRandom(seed+68)
 
+	local heightmap = minetest.get_mapgen_object("heightmap")
+	local hmi = 1
+
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	data = vm:get_data()
 	area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
@@ -181,11 +184,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			if in_biome then
 
-				local ymin = math.max(1, minp.y) -- -1
+				local ymin = math.max(heightmap[hmi]-5, minp.y) -- -1
 
 				-- skip the air part
 				local ground
-				for y = maxp.y,ymin,-1 do
+				for y = math.min(heightmap[hmi]+20, maxp.y),ymin,-1 do
 					if data[area:index(x, y, z)] ~= c.air then
 						ground = y
 						break
@@ -255,6 +258,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 				end
 			end
+			hmi = hmi+1
 		end
 	end
 	riesenpilz.inform("ground finished", 2, t1)
