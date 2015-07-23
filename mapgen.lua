@@ -250,10 +250,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					elseif pr:next(1,5000) == 1 then
 						riesenpilz_circle(c.riesenpilz_glowshroom, boden, 3, 3)
 					elseif pr:next(1,6000) == 2 then
-						local raretype = pr:next(1,200)
-						if raretype == 15 then
+						if pr:next(1,200) == 15 then
 							bigtype = 4
-						elseif raretype == 54 then
+						elseif pr:next(1,2000) == 54 then
 							bigtype = 6
 						end
 					end
