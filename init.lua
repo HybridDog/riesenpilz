@@ -280,7 +280,7 @@ function riesenpilz.parasol(pos, nodes, area, w, h)
 		nodes[i] = c.stem
 	end
 
-	local w = w or math.random(MAX_SIZE+1,MAX_SIZE+2)
+	local w = w or MAX_SIZE+math.random(2)
 	local bhead1 = w-1
 	local bhead2 = math.random(1,w-2)
 
@@ -313,7 +313,7 @@ end
 local function riesenpilz_parasol(pos)
 	local t1 = os.clock()
 
-	local w = math.random(MAX_SIZE+1,MAX_SIZE+2)
+	local w = MAX_SIZE+math.random(2)
 	local h = 6+math.random(MAX_SIZE)
 
 	local manip = minetest.get_voxel_manip()
@@ -323,6 +323,74 @@ local function riesenpilz_parasol(pos)
 	riesenpilz.parasol(pos, nodes, area, w, h)
 
 	set_vm_data(manip, nodes, pos, t1, "parasol")
+end
+
+
+function riesenpilz.red45(pos, nodes, area, h1, h2)
+	local walkspace = h1 or math.random(MAX_SIZE)
+	local toph = h2 or 1+math.random(MAX_SIZE)
+	local h = walkspace+toph+3
+
+	-- stem
+	for i in area:iterp(pos, {x=pos.x, y=pos.y+h, z=pos.z}) do
+		nodes[i] = c.stem_red
+	end
+
+	for i = -1,1,2 do
+		for l = 0, 1 do
+			nodes[area:index(pos.x+i, pos.y+walkspace+2, pos.z-l*i)] = c.head_red
+			nodes[area:index(pos.x+l*i, pos.y+walkspace+2, pos.z+i)] = c.head_red
+		end
+		nodes[area:index(pos.x, pos.y+walkspace+3, pos.z+i)] = c.head_red
+		nodes[area:index(pos.x+i, pos.y+walkspace+3, pos.z)] = c.head_red
+		for j = -1,1,2 do
+			nodes[area:index(pos.x+j, pos.y+walkspace+1, pos.z+i)] = c.head_red
+			nodes[area:index(pos.x+j*3, pos.y+walkspace+1, pos.z+i*3)] = c.head_red
+			for z = 1,2 do
+				for x = 1,2 do
+					for y = h-toph, h-1 do
+						nodes[area:index(pos.x+x*j, pos.y+y, pos.z+z*i)] = c.head_red
+					end
+					if z ~= 2
+					or x ~= 2
+					or math.random(4) ~= 2 then
+						nodes[area:index(pos.x+x*j, pos.y+h, pos.z+z*i)] = c.head_red
+					end
+					local z = z+1
+					x = x+1
+					nodes[area:index(pos.x+x*j, pos.y+walkspace+2, pos.z+z*i)] = c.head_red
+					if z ~= 3
+					or x ~= 3
+					or math.random(2) == 1 then
+						nodes[area:index(pos.x+x*j, pos.y+walkspace+3, pos.z+z*i)] = c.head_red
+					end
+				end
+			end
+		end
+	end
+
+	-- top
+	for z = -1,1 do
+		for x = -1,1 do
+			nodes[area:index(pos.x+x, pos.y+h+1, pos.z+z)] = c.head_red
+		end
+	end
+end
+
+local function riesenpilz_red45(pos)
+	local t1 = os.clock()
+
+	local h1 = math.random(MAX_SIZE)
+	local h2 = 1+math.random(MAX_SIZE)
+	local h = h1+h2+4
+
+	local manip = minetest.get_voxel_manip()
+	local area = r_area(manip, 3, h, pos)
+	local nodes = manip:get_data()
+
+	riesenpilz.red45(pos, nodes, area, h1, h2)
+
+	set_vm_data(manip, nodes, pos, t1, "red45")
 end
 
 
@@ -735,9 +803,23 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
+minetest.register_craftitem("riesenpilz:mush45_meal", {
+	description = "Mushroom Meal",
+	inventory_image = "riesenpilz_mush45_meal.png",
+	on_use = minetest.item_eat(6),
+})
+
+minetest.register_craft({
+	output = "riesenpilz:mush45_meal 4",
+	recipe = {
+		{"riesenpilz:brown45", "riesenpilz:red45"},
+		{"riesenpilz:red45", "riesenpilz:brown45"},
+	}
+})
 
 
---Mushroom Nodes
+
+--Big Mushroom Nodes
 
 
 local pilznode_list = {
@@ -755,6 +837,11 @@ local pilznode_list = {
 		typ = "stem",
 		name = "blue",
 		textures = {"stem_top.png","stem_top.png","stem_blue.png"},
+	},
+	{
+		typ = "stem",
+		name = "red",
+		textures = {"stem_red45_top.png","stem_red45_top.png","stem_red45.png"},
 	},
 	{
 		name = "lamellas",
@@ -925,6 +1012,8 @@ c = {
 	head_binge = minetest.get_content_id("riesenpilz:head_binge"),
 	head_brown_bright = minetest.get_content_id("riesenpilz:head_brown_bright"),
 
+	stem_red = minetest.get_content_id("riesenpilz:stem_red"),
+
 	red = minetest.get_content_id("default:copperblock"),
 	brown = minetest.get_content_id("default:desert_stone"),
 	tree = minetest.get_content_id("default:tree"),
@@ -955,6 +1044,8 @@ minetest.register_on_punchnode(function(pos, node, puncher)
 			riesenpilz_glowshroom(pos)
 		elseif name == "riesenpilz:parasol" then
 			riesenpilz_parasol(pos)
+		elseif name == "riesenpilz:red45" then
+			riesenpilz_red45(pos)
 		elseif name == "default:apple" then
 			riesenpilz_apple(pos)
 		end
