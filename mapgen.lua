@@ -225,6 +225,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							break
 						end
 					end
+					local bigtype
 					local boden = {x=x,y=ground_y+1,z=z}
 					if pr:next(1,15) == 1 then
 						data[area:index(x, ground_y+1, z)] = c.dry_shrub
@@ -236,24 +237,28 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						riesenpilz_circle(c.riesenpilz_red, boden, pr:next(4,5), 3)
 					elseif pr:next(1,100) == 1 then
 						riesenpilz_circle(c.riesenpilz_fly_agaric, boden, 4, 3)
+					elseif pr:next(1,340) == 10 then
+						bigtype = 2
+					elseif pr:next(1,380) == 1 then
+						bigtype = 1
+					elseif pr:next(1,390) == 20 then
+						bigtype = 3
+					elseif pr:next(1,800) == 7 then
+						bigtype = 5
 					elseif pr:next(1,4000) == 1 then
 						riesenpilz_circle(c.riesenpilz_lavashroom, boden, pr:next(5,6), 3)
 					elseif pr:next(1,5000) == 1 then
 						riesenpilz_circle(c.riesenpilz_glowshroom, boden, 3, 3)
-					elseif pr:next(1,380) == 1 then
-						tab[num] = {1, boden}
-						num = num+1
-					elseif pr:next(1,340) == 10 then
-						tab[num] = {2, boden}
-						num = num+1
-					elseif pr:next(1,390) == 20 then
-						tab[num] = {3, boden}
-						num = num+1
-					elseif pr:next(1,6000) == 2 and pr:next(1,200) == 15 then
-						tab[num] = {4, boden}
-						num = num+1
-					elseif pr:next(1,800) == 7 then
-						tab[num] = {5, boden}
+					elseif pr:next(1,6000) == 2 then
+						local raretype = pr:next(1,200)
+						if raretype == 15 then
+							bigtype = 4
+						elseif raretype == 54 then
+							bigtype = 6
+						end
+					end
+					if bigtype then
+						tab[num] = {bigtype, boden}
 						num = num+1
 					end
 				end
@@ -282,6 +287,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				riesenpilz.lavashroom(p, data, area)
 			elseif m == 5 then
 				riesenpilz.parasol(p, data, area)
+			elseif m == 6 then
+				riesenpilz.red45(p, data, area)
 			end
 		end
 		riesenpilz.inform("giant shrooms generated", 2, t2)
