@@ -327,7 +327,7 @@ end
 
 
 function riesenpilz.red45(pos, nodes, area, h1, h2)
-	local walkspace = h1 or math.random(MAX_SIZE)
+	local walkspace = h1 or math.random(2,MAX_SIZE)
 	local toph = h2 or 1+math.random(MAX_SIZE)
 	local h = walkspace+toph+3
 
@@ -338,6 +338,18 @@ function riesenpilz.red45(pos, nodes, area, h1, h2)
 
 	for i = -1,1,2 do
 		for l = 0, 1 do
+			if math.random(2) == 1 then
+				nodes[area:index(pos.x+i, pos.y, pos.z-l*i)] = c.stem_red
+				if math.random(2) == 1 then
+					nodes[area:index(pos.x+i, pos.y+1, pos.z-l*i)] = c.stem_red
+				end
+			end
+			if math.random(2) == 1 then
+				nodes[area:index(pos.x+l*i, pos.y, pos.z+i)] = c.stem_red
+				if math.random(2) == 1 then
+					nodes[area:index(pos.x+l*i, pos.y+1, pos.z+i)] = c.stem_red
+				end
+			end
 			nodes[area:index(pos.x+i, pos.y+walkspace+2, pos.z-l*i)] = c.head_red
 			nodes[area:index(pos.x+l*i, pos.y+walkspace+2, pos.z+i)] = c.head_red
 		end
@@ -380,7 +392,7 @@ end
 local function riesenpilz_red45(pos)
 	local t1 = os.clock()
 
-	local h1 = math.random(MAX_SIZE)
+	local h1 = math.random(2,MAX_SIZE)
 	local h2 = 1+math.random(MAX_SIZE)
 	local h = h1+h2+4
 
