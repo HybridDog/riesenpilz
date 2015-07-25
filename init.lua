@@ -328,8 +328,8 @@ end
 
 function riesenpilz.red45(pos, nodes, area, h1, h2)
 	local walkspace = h1 or math.random(2,MAX_SIZE)
-	local toph = h2 or 1+math.random(MAX_SIZE)
-	local h = walkspace+toph+3
+	local toph = h2 or math.random(MAX_SIZE)
+	local h = walkspace+toph+4
 
 	-- stem
 	for i in area:iterp(pos, {x=pos.x, y=pos.y+h, z=pos.z}) do
@@ -393,8 +393,8 @@ local function riesenpilz_red45(pos)
 	local t1 = os.clock()
 
 	local h1 = math.random(2,MAX_SIZE)
-	local h2 = 1+math.random(MAX_SIZE)
-	local h = h1+h2+4
+	local h2 = math.random(MAX_SIZE)
+	local h = h1+h2+5
 
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, 3, h, pos)

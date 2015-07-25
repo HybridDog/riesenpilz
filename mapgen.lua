@@ -1,3 +1,5 @@
+local minetest = minetest	--Should make things a bit faster.
+
 local c
 local function define_contents()
 	c = {
@@ -104,8 +106,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
-	local env = minetest.env	--Should make things a bit faster.
-	local perlin1 = env:get_perlin(51,3, 0.5, perlin_scale)	--Get map specific perlin
+	local perlin1 = minetest.get_perlin(51,3, 0.5, perlin_scale)	--Get map specific perlin
 
 	if not riesenpilz.always_generate then
 		local biome_allowed
@@ -154,11 +155,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 		end
 	end
-		--[[remove usual stuff
-		local trees = env:find_nodes_in_area(minp, maxp, USUAL_STUFF)
-		for i,v in pairs(trees) do
-			env:remove_node(v)
-		end]]
 
 	for j=0,divs do
 		for i=0,divs do
