@@ -1070,4 +1070,10 @@ if riesenpilz.enable_mapgen then
 	dofile(minetest.get_modpath("riesenpilz") .. "/mapgen.lua")
 end
 
-riesenpilz.inform("loaded", 1, load_time_start)
+local time = math.floor(tonumber(os.clock()-load_time_start)*100+0.5)/100
+local msg = "[riesenpilz] loaded after ca. "..time
+if time > 0.05 then
+	print(msg)
+else
+	minetest.log("info", msg)
+end
