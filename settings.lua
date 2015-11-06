@@ -25,3 +25,6 @@ riesenpilz.inform_all = false--minetest.is_singleplayer()
 
 --1:<a bit of information> 2:<acceptable amount of information> 3:<lots of text>
 riesenpilz.max_spam = 2
+
+--3d apple
+riesenpilz.change_apple = true
