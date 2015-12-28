@@ -830,6 +830,7 @@ local head_sounds = default.node_sound_wood_defaults({
 	dug = {name="riesenpilz_stem", gain=0.1}
 })
 local add_fence = minetest.register_fence
+local node_groups = {oddly_breakable_by_hand=3, fall_damage_add_percent=-80, bouncy=10}
 
 for _,i in pairs({
 	{
@@ -960,7 +961,7 @@ for _,i in pairs({
 	minetest.register_node(nodename, {
 		description = desctiption,
 		tiles = textures,
-		groups = {oddly_breakable_by_hand=3, fall_damage_add_percent=-80},
+		groups = node_groups,
 		drop = drop,
 		sounds = sounds,
 	})
@@ -976,7 +977,7 @@ minetest.register_node("riesenpilz:head_red_side", {
 	tiles = {"riesenpilz_head.png",	"riesenpilz_lamellas.png",	"riesenpilz_head.png",
 					"riesenpilz_head.png",	"riesenpilz_head.png",	"riesenpilz_lamellas.png"},
 	paramtype2 = "facedir",
-	groups = {oddly_breakable_by_hand=3, fall_damage_add_percent=-80},
+	groups = node_groups,
 	drop = {max_items = 1,
 		items = {{items = {"riesenpilz:fly_agaric"},rarity = 20,},
 		{items = {"riesenpilz:head_red"},rarity = 1,}}},
