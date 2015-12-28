@@ -13,4 +13,6 @@ If you got ideas or found bugs, please tell them to me.
 
 TODO:  
 — add more giant mushrooms  
-— finish supporting the mushrooms mod
+— finish supporting the mushrooms mod  
+— add lava suit  
+— eating must become possible
