@@ -1,4 +1,6 @@
-[Mod] riesenpilz [riesenpilz]
+[Mod] mushrooms [riesenpilz]
+
+This mod adds mushrooms to minetest. The growing tool can make them giant.
 
 **Depends:** see [depends.txt](https://raw.githubusercontent.com/HybridDog/riesenpilz/master/depends.txt)  
 **License:** see [LICENSE.txt](https://raw.githubusercontent.com/HybridDog/riesenpilz/master/LICENSE.txt)  

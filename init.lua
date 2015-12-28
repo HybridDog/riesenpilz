@@ -829,6 +829,7 @@ local head_sounds = default.node_sound_wood_defaults({
 	dig = {name="riesenpilz_head", gain=0.2},
 	dug = {name="riesenpilz_stem", gain=0.1}
 })
+local add_fence = minetest.register_fence
 
 for _,i in pairs({
 	{
@@ -840,11 +841,13 @@ for _,i in pairs({
 		typ = "stem",
 		name = "brown",
 		textures = {"stem_top.png", "stem_top.png", "stem_brown.png"},
+		fence = false,
 	},
 	{
 		typ = "stem",
 		name = "blue",
 		textures = {"stem_top.png","stem_top.png","stem_blue.png"},
+		fence = false,
 	},
 	{
 		typ = "stem",
@@ -879,14 +882,15 @@ for _,i in pairs({
 		typ = "head",
 		name = "brown",
 		textures = {"brown_top.png", "lamellas.png", "brown_top.png"},
-		sapling = "brown"
+		sapling = "brown",
 	},
 	{
 		typ = "head",
 		name = "brown_full",
 		description = "full brown",
 		textures = "brown_top.png",
-		sapling = "brown"
+		sapling = "brown",
+		fence = false,
 	},
 	{
 		typ = "head",
@@ -960,6 +964,11 @@ for _,i in pairs({
 		drop = drop,
 		sounds = sounds,
 	})
+
+	if add_fence
+	and i.fence ~= false then
+		add_fence({fence_of = nodename})
+	end
 end
 
 minetest.register_node("riesenpilz:head_red_side", {

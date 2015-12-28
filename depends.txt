@@ -1,2 +1,3 @@
 default
 vector_extras
+fence_registration?
