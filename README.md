@@ -15,4 +15,4 @@ TODO:
 — add more giant mushrooms  
 — finish supporting the mushrooms mod  
 — add lava suit  
-— eating must become possible
+— use visual_scale → crop textures and change nodeboxes (maybe automatically)

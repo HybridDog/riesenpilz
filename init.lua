@@ -506,6 +506,7 @@ for name,i in pairs({
 			interval = 100,
 			chance = 18,
 		},
+		hp = 2,
 	},
 	red = {
 		description = "red mushroom",
@@ -524,6 +525,7 @@ for name,i in pairs({
 			interval = 50,
 			chance = 30,
 		},
+		hp = -2,
 	},
 	fly_agaric = {
 		description = "fly agaric",
@@ -540,6 +542,7 @@ for name,i in pairs({
 			interval = 101,
 			chance = 30,
 		},
+		hp = -6,
 	},
 	lavashroom = {
 		description = "Lavashroom",
@@ -557,6 +560,7 @@ for name,i in pairs({
 			interval = 1010,
 			chance = 60,
 		},
+		hp = -1,
 	},
 	glowshroom = {
 		description = "Glowshroom",
@@ -577,6 +581,7 @@ for name,i in pairs({
 			interval = 710,
 			chance = 320,
 		},
+		hp = -2,
 	},
 	nether_shroom = {
 		description = "Nether mushroom",
@@ -590,6 +595,7 @@ for name,i in pairs({
 			{ 2/16, -1/16, -2/16, 4/16,  1/16, 2/16}
 		},
 		burntime = 6,
+		hp = -3,
 	},
 	parasol = {
 		description = "white parasol mushroom",
@@ -608,6 +614,7 @@ for name,i in pairs({
 			interval = 51,
 			chance = 36,
 		},
+		hp = 3,
 	},
 	red45 = {
 		description = "45 red mushroom",
@@ -627,6 +634,7 @@ for name,i in pairs({
 			interval = 1000,
 			chance = 180,
 		},
+		hp = 1,
 	},
 	brown45 = {
 		description = "45 brown mushroom",
@@ -645,6 +653,7 @@ for name,i in pairs({
 			interval = 100,
 			chance = 20,
 		},
+		hp = 1,
 	},
 }) do
 	local burntime = i.burntime or 1
@@ -655,7 +664,11 @@ for name,i in pairs({
 	local nd = "riesenpilz:"..name
 	minetest.register_node(nd, {
 		description = i.description,
-		tiles = {"riesenpilz_"..name.."_top.png", "riesenpilz_"..name.."_bottom.png", "riesenpilz_"..name.."_side.png"},
+		tiles = {
+			{name = "riesenpilz_"..name.."_top.png", tileable_vertical = false},
+			{name = "riesenpilz_"..name.."_bottom.png", tileable_vertical = false},
+			{name = "riesenpilz_"..name.."_side.png", tileable_vertical = false},
+		},
 		inventory_image = "riesenpilz_"..name.."_side.png",
 		walkable = false,
 		buildable_to = true,
@@ -665,7 +678,8 @@ for name,i in pairs({
 		sounds =  default.node_sound_leaves_defaults(),
 		node_box = box,
 		selection_box = box,
-		furnace_burntime = burntime
+		furnace_burntime = burntime,
+		on_secondary_use = minetest.item_eat(i.hp),
 	})
 
 	local g = i.growing
@@ -705,6 +719,7 @@ for name,i in pairs({
 			neighbors = g.neighbours,
 			interval = g.interval,
 			chance = g.chance,
+			catch_up = false,
 			action = function(pos, node)
 				if not abm_allowed then
 					return
@@ -745,7 +760,7 @@ for name,i in pairs({
 			-- should disallow lag
 				abm_allowed = false
 				minetest.after(2, function() abm_allowed = true end)
-				table.insert(disallowed_ps, pos)
+				disallowed_ps[#disallowed_ps+1] = pos
 
 			-- witch circles
 				local ps = {}
@@ -785,7 +800,7 @@ for name,i in pairs({
 										local light = minetest.get_node_light(pos, 0.5)
 										if light >= lmin
 										and light <= lmax then
-											table.insert(ps, pos)
+											ps[#ps+1] = pos
 										end
 									end
 								end
