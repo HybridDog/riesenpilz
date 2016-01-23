@@ -1081,9 +1081,10 @@ end)
 
 
 
--- Food
+-- Uses
 
 
+-- mush45's meal
 minetest.register_craftitem("riesenpilz:mush45_meal", {
 	description = "Mushroom Meal",
 	inventory_image = "riesenpilz_mush45_meal.png",
@@ -1098,6 +1099,54 @@ minetest.register_craft({
 	}
 })
 
+
+--[[ unfinished
+if minetest.global_exists(technic) then
+	if minetest.global_exists(digilines) then
+		-- digiline light value detector
+		minetest.register_node("riesenpilz:light_detector" {
+			tiles = {"riesenpilz_light_detector.png"},
+			paramtype = "light",
+			digiline = {
+				receive = function(pos)
+					local light = minetest.get_node_light(pos)
+					send("light_detector", light)
+				end,
+			},
+			--sounds = ,
+		})
+
+		--technic.comp({"riesenpilz:glowshroom 10", "coal"}, "riesenpilz:light_detector")
+	end
+
+
+	--[ [
+	if minetest.global_exists(3darmor) then add to depends
+		--lavashroom skin armor, swimming in lava possible
+
+		minetest.register_craftitem("riesenpilz:lavashroom_flesh", {
+			description = "lavashroom's flesh",
+			inventory_image = "riesenpilz_lavashroom_flesh.png",
+			on_use = minetest.item_eat(3),
+		})
+
+		minetest.register_craftitem("riesenpilz:lavashroom_skin", {
+			description = "lavashroom's skin",
+			inventory_image = "riesenpilz_lavashroom_skin.png",
+		})
+
+		minetest.register_craftitem("riesenpilz:antilava_plate", {
+			description = "lava protecting plate",
+			inventory_image = "riesenpilz_antilava_plate.png",
+		})
+
+		technic.centri("riesenpilz:lavashroom", {"riesenpilz:lavashroom_flesh", "riesenpilz:lavashroom_skin"})
+		technic.comp("riesenpilz:lavashroom_skin 5", "riesenpilz:antilava_plate")
+
+		armor_register(plate blah)
+	end--] ]
+})
+end--]]
 
 
 if riesenpilz.enable_mapgen then
