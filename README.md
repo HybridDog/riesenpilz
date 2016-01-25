@@ -16,4 +16,4 @@ TODO:
 — finish supporting the mushrooms mod  
 — add lava suit  
 — use visual_scale → crop textures and change nodeboxes (maybe automatically)  
-— don't replace every kind of node if a mushroom becomes giant (fly agaric, apple)
+— make the growingtool craftable

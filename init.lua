@@ -36,7 +36,7 @@ local function replacing_allowed(id)
 	return false
 end
 
-local function set_vm_data(manip, pznodes, pos, t1, name)
+local function set_vm_nodes(manip, pznodes)
 	local nodes = manip:get_data()
 	for vi,id in pairs(pznodes) do
 		if replacing_allowed(nodes[vi]) then
@@ -44,6 +44,10 @@ local function set_vm_data(manip, pznodes, pos, t1, name)
 		end
 	end
 	manip:set_data(nodes)
+end
+
+local function set_vm_data(manip, pznodes, pos, t1, name)
+	set_vm_nodes(manip, pznodes)
 	manip:write_to_map()
 	riesenpilz.inform("a giant "..name.." mushroom grew at "..vector.pos_to_string(pos), 3, t1)
 	local t1 = os.clock()
@@ -158,12 +162,12 @@ local function riesenpilz_minecraft_fliegenpilz(pos)
 
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, 2, 4, pos)
-	local nodes = manip:get_data()
 	local param2s = manip:get_param2_data()
 
-	riesenpilz.fly_agaric(pos, nodes, area, param2s)
+	local pznodes = {}
+	riesenpilz.fly_agaric(pos, pznodes, area, param2s)
 
-	manip:set_data(nodes)
+	set_vm_nodes(manip, pznodes)
 	manip:set_param2_data(param2s)
 	manip:write_to_map()
 	manip:update_map()
@@ -469,11 +473,11 @@ local function riesenpilz_apple(pos)
 	local t1 = os.clock()
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, 5, 14, pos)
-	local nodes = manip:get_data()
 
-	riesenpilz.apple(pos, nodes, area)
+	local pznodes = {}
+	riesenpilz.apple(pos, pznodes, area)
 
-	manip:set_data(nodes)
+	set_vm_nodes(manip, pznodes)
 	manip:write_to_map()
 	riesenpilz.inform("an apple grew at "..vector.pos_to_string(pos), 3, t1)
 	manip:update_map()
