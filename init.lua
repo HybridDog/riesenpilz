@@ -17,7 +17,32 @@ local function r_area(manip, width, height, pos)
 	return VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
 end
 
-local function set_vm_data(manip, nodes, pos, t1, name)
+-- contents become added later
+local c
+
+-- cache buildable_to ids
+local re_al_cache = {[minetest.get_content_id("ignore")] = true}
+local function replacing_allowed(id)
+	if re_al_cache[id] ~= nil then
+		return re_al_cache[id]
+	end
+	local def = minetest.registered_nodes[minetest.get_name_from_content_id(id)]
+	if not def
+	or def.buildable_to then
+		re_al_cache[id] = true
+		return true
+	end
+	re_al_cache[id] = false
+	return false
+end
+
+local function set_vm_data(manip, pznodes, pos, t1, name)
+	local nodes = manip:get_data()
+	for vi,id in pairs(pznodes) do
+		if replacing_allowed(nodes[vi]) then
+			nodes[vi] = id
+		end
+	end
 	manip:set_data(nodes)
 	manip:write_to_map()
 	riesenpilz.inform("a giant "..name.." mushroom grew at "..vector.pos_to_string(pos), 3, t1)
@@ -26,9 +51,6 @@ local function set_vm_data(manip, nodes, pos, t1, name)
 	riesenpilz.inform("map updated", 3, t1)
 end
 
-
--- contents become added later
-local c
 
 function riesenpilz.red(pos, nodes, area, w)
 	local w = w or math.random(MAX_SIZE)
@@ -61,11 +83,11 @@ local function riesenpilz_hybridpilz(pos)
 
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, w+1, w+3, pos)
-	local nodes = manip:get_data()
 
-	riesenpilz.red(pos, nodes, area, w)
+	local pznodes = {}
+	riesenpilz.red(pos, pznodes, area, w)
 
-	set_vm_data(manip, nodes, pos, t1, "red")
+	set_vm_data(manip, pznodes, pos, t1, "red")
 end
 
 
@@ -96,11 +118,11 @@ local function riesenpilz_brauner_minecraftpilz(pos)
 
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, br+1, br+3, pos)
-	local nodes = manip:get_data()
 
-	riesenpilz.brown(pos, nodes, area, br)
+	local pznodes = {}
+	riesenpilz.brown(pos, pznodes, area, br)
 
-	set_vm_data(manip, nodes, pos, t1, "brown")
+	set_vm_data(manip, pznodes, pos, t1, "brown")
 end
 
 
@@ -217,11 +239,11 @@ local function riesenpilz_lavashroom(pos)
 
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, 4, h+6, pos)
-	local nodes = manip:get_data()
 
-	riesenpilz.lavashroom(pos, nodes, area, h)
+	local pznodes = {}
+	riesenpilz.lavashroom(pos, pznodes, area, h)
 
-	set_vm_data(manip, nodes, pos, t1, "lavashroom")
+	set_vm_data(manip, pznodes, pos, t1, "lavashroom")
 end
 
 
@@ -266,11 +288,11 @@ local function riesenpilz_glowshroom(pos)
 
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, 2, h+3, pos)
-	local nodes = manip:get_data()
 
-	riesenpilz.glowshroom(pos, nodes, area, h)
+	local pznodes = {}
+	riesenpilz.glowshroom(pos, pznodes, area, h)
 
-	set_vm_data(manip, nodes, pos, t1, "glowshroom")
+	set_vm_data(manip, pznodes, pos, t1, "glowshroom")
 end
 
 
@@ -320,11 +342,11 @@ local function riesenpilz_parasol(pos)
 
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, w, h, pos)
-	local nodes = manip:get_data()
 
-	riesenpilz.parasol(pos, nodes, area, w, h)
+	local pznodes = {}
+	riesenpilz.parasol(pos, pznodes, area, w, h)
 
-	set_vm_data(manip, nodes, pos, t1, "parasol")
+	set_vm_data(manip, pznodes, pos, t1, "parasol")
 end
 
 
@@ -400,11 +422,11 @@ local function riesenpilz_red45(pos)
 
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, 3, h, pos)
-	local nodes = manip:get_data()
 
-	riesenpilz.red45(pos, nodes, area, h1, h2)
+	local pznodes = {}
+	riesenpilz.red45(pos, pznodes, area, h1, h2)
 
-	set_vm_data(manip, nodes, pos, t1, "red45")
+	set_vm_data(manip, pznodes, pos, t1, "red45")
 end
 
 
