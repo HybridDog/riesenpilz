@@ -456,16 +456,16 @@ function riesenpilz.apple(pos, nodes, area)
 		nodes[area:index(pos.x, pos.y+i, pos.z)] = c.tree
 	end
 
-	local c = pos.y+1
+	local d = pos.y+1
 	for i = -3,1,1 do
-		nodes[area:index(pos.x+i, c, pos.z+1)] = c.brown
+		nodes[area:index(pos.x+i, d, pos.z+1)] = c.brown
 	end
 	for i = 0,1,1 do
-		nodes[area:index(pos.x+i+1, c, pos.z-1-i)] = c.brown
-		nodes[area:index(pos.x+i+2, c, pos.z-1-i)] = c.brown
+		nodes[area:index(pos.x+i+1, d, pos.z-1-i)] = c.brown
+		nodes[area:index(pos.x+i+2, d, pos.z-1-i)] = c.brown
 	end
-	nodes[area:index(pos.x+1, c, pos.z)] = c.brown
-	nodes[area:index(pos.x-3, c+1, pos.z+1)] = c.brown
+	nodes[area:index(pos.x+1, d, pos.z)] = c.brown
+	nodes[area:index(pos.x-3, d+1, pos.z+1)] = c.brown
 end
 
 local function riesenpilz_apple(pos)
