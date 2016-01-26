@@ -28,3 +28,6 @@ riesenpilz.max_spam = 2
 
 --3d apple
 riesenpilz.change_apple = true
+
+--disallows growing a mushroom if it not every node would have a free place
+riesenpilz.giant_restrict_area = false

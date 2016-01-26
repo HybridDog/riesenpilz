@@ -36,18 +36,36 @@ local function replacing_allowed(id)
 	return false
 end
 
-local function set_vm_nodes(manip, pznodes)
-	local nodes = manip:get_data()
-	for vi,id in pairs(pznodes) do
-		if replacing_allowed(nodes[vi]) then
+local set_vm_nodes
+if riesenpilz.giant_restrict_area then
+	function set_vm_nodes(manip, pznodes)
+		local nodes = manip:get_data()
+		for vi,id in pairs(pznodes) do
+			if not replacing_allowed(nodes[vi]) then
+				return false
+			end
 			nodes[vi] = id
 		end
+		manip:set_data(nodes)
+		return true
 	end
-	manip:set_data(nodes)
+else
+	function set_vm_nodes(manip, pznodes)
+		local nodes = manip:get_data()
+		for vi,id in pairs(pznodes) do
+			if replacing_allowed(nodes[vi]) then
+				nodes[vi] = id
+			end
+		end
+		manip:set_data(nodes)
+		return true
+	end
 end
 
 local function set_vm_data(manip, pznodes, pos, t1, name)
-	set_vm_nodes(manip, pznodes)
+	if not set_vm_nodes(manip, pznodes) then
+		return
+	end
 	manip:write_to_map()
 	riesenpilz.inform("a giant "..name.." mushroom grew at "..vector.pos_to_string(pos), 3, t1)
 	local t1 = os.clock()
@@ -167,7 +185,9 @@ local function riesenpilz_minecraft_fliegenpilz(pos)
 	local pznodes = {}
 	riesenpilz.fly_agaric(pos, pznodes, area, param2s)
 
-	set_vm_nodes(manip, pznodes)
+	if not set_vm_nodes(manip, pznodes) then
+		return
+	end
 	manip:set_param2_data(param2s)
 	manip:write_to_map()
 	manip:update_map()
@@ -477,7 +497,9 @@ local function riesenpilz_apple(pos)
 	local pznodes = {}
 	riesenpilz.apple(pos, pznodes, area)
 
-	set_vm_nodes(manip, pznodes)
+	if not set_vm_nodes(manip, pznodes) then
+		return
+	end
 	manip:write_to_map()
 	riesenpilz.inform("an apple grew at "..vector.pos_to_string(pos), 3, t1)
 	manip:update_map()
