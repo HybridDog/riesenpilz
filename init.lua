@@ -1127,9 +1127,9 @@ local function get_grow(name)
 
 	local func
 	if is[1] then
-		function func(pos)
+		function func(pos, node)
 			for i = 1,#is do
-				is[i](pos)
+				is[i](pos, node)
 			end
 		end
 	else
