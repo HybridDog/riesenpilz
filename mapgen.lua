@@ -6,6 +6,7 @@ local function define_contents()
 		ignore = minetest.get_content_id("ignore"),
 		air = minetest.get_content_id("air"),
 
+		water = minetest.get_content_id("default:water_source"),
 		stone = minetest.get_content_id("default:stone"),
 		dirt = minetest.get_content_id("default:dirt"),
 		desert_sand = minetest.get_content_id("default:desert_sand"),
@@ -30,8 +31,8 @@ local function define_contents()
 			minetest.get_content_id("default:junglegrass"),
 		},
 		USUAL_STUFF = {
-			minetest.get_content_id("default:cactus"),
-			minetest.get_content_id("default:papyrus"),
+			[minetest.get_content_id("default:cactus")] = true,
+			[minetest.get_content_id("default:papyrus")] = true
 		},
 	}
 	for name,data in pairs(minetest.registered_nodes) do
@@ -52,6 +53,27 @@ local function find_ground(a,list)
 			return true
 		end
 	end
+	return false
+end
+
+local grounds = {}
+function is_ground(id)
+	local is = grounds[id]
+	if is ~= nil then
+		return is
+	end
+	local data = minetest.registered_nodes[minetest.get_name_from_content_id(id)]
+	if not data then
+		grounds[id] = false
+		return false
+	end
+	local groups = data.groups
+	if groups
+	and (groups.crumbly == 3 or groups.soil == 1) then
+		grounds[id] = true
+		return true
+	end
+	grounds[id] = false
 	return false
 end
 
@@ -180,7 +202,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			if in_biome then
 
-				local ymin = math.max(heightmap[hmi]-5, minp.y) -- -1
+				local ymin = math.max(heightmap[hmi]-5, minp.y)
 
 				-- skip the air part
 				local ground
@@ -196,16 +218,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					for y = ground,ymin,-1 do
 						local p_pos = area:index(x, y, z)
 						local d_p_pos = data[p_pos]
-						for _,nam in pairs(c.USUAL_STUFF) do --remove usual stuff
-							if d_p_pos == nam then
-								data[p_pos] = c.air
-								p_pos = nil
-								break
+						if c.USUAL_STUFF[d_p_pos] then --remove usual stuff
+							data[p_pos] = c.air
+						else
+							if d_p_pos ~= c.water
+							and is_ground(d_p_pos) then --else search ground_y
+								ground_y = y
 							end
-						end
-						if p_pos --else search ground_y
-						and find_ground(d_p_pos, c.GROUND) then
-							ground_y = y
 							break
 						end
 					end
