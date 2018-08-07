@@ -21,7 +21,6 @@ local function define_contents()
 		riesenpilz_glowshroom = minetest.get_content_id("riesenpilz:glowshroom"),
 		riesenpilz_parasol = minetest.get_content_id("riesenpilz:parasol"),
 
-		GROUND = {},
 		TREE_STUFF = {
 			minetest.get_content_id("default:tree"),
 			minetest.get_content_id("default:leaves"),
@@ -35,26 +34,8 @@ local function define_contents()
 			[minetest.get_content_id("default:papyrus")] = true
 		},
 	}
-	for name,data in pairs(minetest.registered_nodes) do
-		local groups = data.groups
-		if groups then
-			if groups.crumbly == 3
-			or groups.soil == 1 then
-				table.insert(c.GROUND, minetest.get_content_id(name))
-			end
-		end
-	end
 end
 
-
-local function find_ground(a,list)
-	for i = 1,#list do
-		if a == list[i] then
-			return true
-		end
-	end
-	return false
-end
 
 local grounds = {}
 function is_ground(id)
@@ -63,7 +44,8 @@ function is_ground(id)
 		return is
 	end
 	local data = minetest.registered_nodes[minetest.get_name_from_content_id(id)]
-	if not data then
+	if not data
+	or data.paramtype == "light" then
 		grounds[id] = false
 		return false
 	end
@@ -78,24 +60,18 @@ function is_ground(id)
 end
 
 
-local data, area
+local data, area, pr
 function riesenpilz_circle(nam, pos, radius, chance)
-	for _,p in pairs(vector.circle(radius)) do
-		if pr:next(1,chance) == 1 then
-			local p = vector.add(pos, p)
-			local p_p = area:indexp(p)
-			if (data[p_p] == c.air or data[p_p] == c.ignore)
-			and find_ground(data[area:index(p.x, p.y-1, p.z)], c.GROUND) then
-				data[p_p] = nam
+	local circle = vector.circle(radius)
+	for i = 1,#circle do
+		if pr:next(1, chance) == 1 then
+			local vi = area:indexp(vector.add(pos, circle[i]))
+			if data[vi] == c.air
+			and is_ground(data[vi - area.ystride]) then
+				data[vi] = nam
 			end
 		end
 	end
-end
-
-local function say_info(info)
-	local info = "[riesenpilz] "..info
-	print(info)
-	minetest.chat_send_all(info)
 end
 
 -- perlin noise "hills" are not peaks but looking like sinus curve
@@ -203,47 +179,52 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			if in_biome then
 
 				local ymin = math.max(heightmap[hmi]-5, minp.y)
+				local ymax = math.min(heightmap[hmi]+20, maxp.y)
 
 				-- skip the air part
 				local ground
-				for y = math.min(heightmap[hmi]+20, maxp.y),ymin,-1 do
-					if data[area:index(x, y, z)] ~= c.air then
+				local vi = area:index(x, ymax, z)
+				for y = ymax, ymin, -1 do
+					if data[vi] ~= c.air then
 						ground = y
 						break
 					end
+					vi = vi - area.ystride
 				end
 
 				local ground_y
 				if ground then
-					for y = ground,ymin,-1 do
-						local p_pos = area:index(x, y, z)
-						local d_p_pos = data[p_pos]
-						if c.USUAL_STUFF[d_p_pos] then --remove usual stuff
-							data[p_pos] = c.air
+					for y = ground, ymin, -1 do
+						local d_p_pos = data[vi]
+						if c.USUAL_STUFF[d_p_pos] then
+							-- remove trees etc.
+							data[vi] = c.air
 						else
-							if d_p_pos ~= c.water
-							and is_ground(d_p_pos) then --else search ground_y
+							if is_ground(d_p_pos) then
 								ground_y = y
 							end
 							break
 						end
+						vi = vi - area.ystride
 					end
 				end
 
 				if ground_y then
-					data[area:index(x, ground_y, z)] = c.ground
+					-- add ground and dirt below if needed
+					data[vi] = c.ground
 					for i = -1,-5,-1 do
-						local p_pos = area:index(x, ground_y+i, z)
-						if data[p_pos] == c.desert_sand then
-							data[p_pos] = c.dirt
-						else
+						local p_pos = vi + i * area.ystride
+						if not is_ground(data[p_pos])
+						or data[p_pos] == c.dirt then
 							break
 						end
+						data[p_pos] = c.dirt
 					end
+
 					local bigtype
 					local boden = {x=x,y=ground_y+1,z=z}
 					if pr:next(1,15) == 1 then
-						data[area:index(x, ground_y+1, z)] = c.dry_shrub
+						data[vi + area.ystride] = c.dry_shrub
 					elseif pr:next(1,80) == 1 then
 						riesenpilz_circle(c.riesenpilz_brown, boden, pr:next(3,4), 3)
 					elseif pr:next(1,85) == 1 then
