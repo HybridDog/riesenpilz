@@ -713,9 +713,12 @@ for name,i in pairs({
 	minetest.register_node(nd, {
 		description = i.description,
 		tiles = {
-			{name = "riesenpilz_"..name.."_top.png", tileable_vertical = false},
-			{name = "riesenpilz_"..name.."_bottom.png", tileable_vertical = false},
-			{name = "riesenpilz_"..name.."_side.png", tileable_vertical = false},
+			--~ {name = "riesenpilz_"..name.."_top.png", tileable_vertical = false},
+			--~ {name = "riesenpilz_"..name.."_bottom.png", tileable_vertical = false},
+			--~ {name = "riesenpilz_"..name.."_side.png", tileable_vertical = false},
+			"riesenpilz_"..name.."_top.png",
+			"riesenpilz_"..name.."_bottom.png",
+			"riesenpilz_"..name.."_side.png",
 		},
 		inventory_image = "riesenpilz_"..name.."_side.png",
 		walkable = false,
