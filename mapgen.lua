@@ -77,7 +77,8 @@ function is_toremove(id)
 end
 
 
-local data, area, pr
+local data = {}
+local area, pr
 function riesenpilz_circle(nam, pos, radius, chance)
 	local circle = vector.circle(radius)
 	for i = 1,#circle do
@@ -92,25 +93,11 @@ function riesenpilz_circle(nam, pos, radius, chance)
 end
 
 
--- perlin noise "hills" are not peaks but looking like sinus curve
-local function upper_rarity(rarity)
-	return math.sign(rarity)*math.sin(math.abs(rarity)*math.pi/2)
-end
-
-local rarity = riesenpilz.mapgen_rarity
-local riesenpilz_size = riesenpilz.mapgen_size
-
-local nosmooth_rarity = 1-rarity/50
-local perlin_scale = riesenpilz_size*100/rarity
-local smooth_rarity_max, smooth_rarity_min, smooth_rarity_dif
-local smooth = riesenpilz.smooth
-if smooth then
-	local smooth_trans_size = riesenpilz.smooth_trans_size
-	smooth_rarity_max = upper_rarity(nosmooth_rarity+smooth_trans_size*2/perlin_scale)
-	smooth_rarity_min = upper_rarity(nosmooth_rarity-smooth_trans_size/perlin_scale)
-	smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
-end
-nosmooth_rarity = upper_rarity(nosmooth_rarity)
+local nosmooth_rarity = 0.5
+local smooth_rarity_max = 0.6
+local smooth_rarity_min = 0.4
+local smooth_rarity_dif = smooth_rarity_max - smooth_rarity_min
+local perlin_scale = 500
 
 local contents_defined
 minetest.register_on_generated(function(minp, maxp, seed)
@@ -158,7 +145,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local hm_zstride = divs+1
 
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	data = vm:get_data()
+	vm:get_data(data)
 	area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
@@ -344,7 +331,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:set_lighting({day=0, night=0})
 	vm:calc_lighting()
 	vm:write_to_map()
-	data = nil
 	area = nil
 	riesenpilz.inform("data set", 2, t2)
 

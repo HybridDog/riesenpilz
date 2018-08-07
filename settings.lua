@@ -1,21 +1,13 @@
 --This file contains configuration options for riesenpilz mod.
 
-riesenpilz.enable_mapgen = true
+-- mapgen size etc. does not work
+riesenpilz.enable_mapgen = false
 
 --Generate giant mushroom biomes everywhere
 riesenpilz.always_generate = false
 
 --Enables smooth transition of biomes.
 riesenpilz.smooth = true
-
---rarity in %
-riesenpilz.mapgen_rarity = 0.4
-
---size of the generated... (has an effect to the rarity, too)
-riesenpilz.mapgen_size = 200
-
---approximate size of smooth transitions
-riesenpilz.smooth_trans_size = 2
 
 --says some information.
 riesenpilz.info = true
