@@ -1122,6 +1122,11 @@ local function get_grow(name)
 	local is = {}
 	for i = 1,#minetest.registered_abms do
 		local ad = minetest.registered_abms[i]
+		if type(ad.nodenames) ~= "table" then
+			minetest.log("warning", "ABM nodenames is not a table: " ..
+				dump(ad))
+			return
+		end
 		if ad.chance > 1
 		and table.indexof(ad.nodenames, name) ~= -1 then
 			is[#is+1] = ad.action
