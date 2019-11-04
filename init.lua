@@ -334,7 +334,7 @@ function riesenpilz.parasol(pos, nodes, area, w, h)
 
 	for _,j in pairs({
 		{bhead2, 0, c.head_brown_bright},
-		{bhead1, -1, c.head_binge}
+		{bhead1, -1, c.head_beige}
 	}) do
 		for i in area:iter(pos.x-j[1], pos.y+h+j[2], pos.z-j[1], pos.x+j[1], pos.y+h+j[2], pos.z+j[1]) do
 			nodes[i] = j[3]
@@ -348,8 +348,8 @@ function riesenpilz.parasol(pos, nodes, area, w, h)
 			nodes[area:index(pos.x+l*k, pos.y+rh, pos.z+k)] = c.head_white
 		end
 		for l = -w+1, w do
-			nodes[area:index(pos.x+w*k, pos.y+h-2, pos.z-l*k)] = c.head_binge
-			nodes[area:index(pos.x+l*k, pos.y+h-2, pos.z+w*k)] = c.head_binge
+			nodes[area:index(pos.x+w*k, pos.y+h-2, pos.z-l*k)] = c.head_beige
+			nodes[area:index(pos.x+l*k, pos.y+h-2, pos.z+w*k)] = c.head_beige
 		end
 		for l = -bhead1+1, bhead1 do
 			nodes[area:index(pos.x+bhead1*k, pos.y+h-2, pos.z-l*k)] = c.head_white
@@ -980,8 +980,8 @@ for _,i in pairs({
 	},
 	{
 		typ = "head",
-		name = "binge",
-		textures = {"head_binge.png", "head_white.png", "head_binge.png"},
+		name = "beige",
+		textures = {"head_beige.png", "head_white.png", "head_beige.png"},
 		sapling = "parasol"
 	},
 	{
@@ -1084,7 +1084,7 @@ c = {
 	head_blue_bright = minetest.get_content_id("riesenpilz:head_blue_bright"),
 
 	head_white = minetest.get_content_id("riesenpilz:head_white"),
-	head_binge = minetest.get_content_id("riesenpilz:head_binge"),
+	head_beige = minetest.get_content_id("riesenpilz:head_beige"),
 	head_brown_bright = minetest.get_content_id("riesenpilz:head_brown_bright"),
 
 	stem_red = minetest.get_content_id("riesenpilz:stem_red"),
@@ -1253,6 +1253,14 @@ end--]]
 if riesenpilz.enable_mapgen then
 	dofile(modpath.."mapgen.lua")
 end
+
+
+
+-- Legacy
+
+
+minetest.register_alias("riesenpilz:head_binge", "riesenpilz:head_beige")
+
 
 local time = math.floor(tonumber(os.clock()-load_time_start)*100+0.5)/100
 local msg = "[riesenpilz] loaded after ca. "..time
