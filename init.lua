@@ -720,6 +720,7 @@ for name,i in pairs({
 			"riesenpilz_"..name.."_bottom.png",
 			"riesenpilz_"..name.."_side.png",
 		},
+		use_texture_alpha = "opaque",
 		inventory_image = "riesenpilz_"..name.."_side.png",
 		walkable = false,
 		buildable_to = true,
