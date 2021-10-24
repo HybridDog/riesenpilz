@@ -24,12 +24,11 @@ function riesenpilz.circle(r)
 	if circle then
 		return circle
 	end
-	local circle, n = {}, 1
+	circle = {}
 	for i = -r, r do
 		for j = -r, r do
 			if math.floor(math.sqrt(i * i + j * j) + 0.5) == r then
-				circle[n] = {x=i, y=0, z=j}
-				n = n+1
+				circle[#circle+1] = {x=i, y=0, z=j}
 			end
 		end
 	end

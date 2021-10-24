@@ -69,15 +69,15 @@ local function set_vm_data(manip, pznodes, pos, t1, name)
 	manip:write_to_map()
 	riesenpilz.inform("a giant " .. name .. " mushroom grew at " ..
 		minetest.pos_to_string(pos), 3, t1)
-	local t1 = os.clock()
+	local t2 = os.clock()
 	manip:update_map()
-	riesenpilz.inform("map updated", 3, t1)
+	riesenpilz.inform("map updated", 3, t2)
 end
 
 
 function riesenpilz.red(pos, nodes, area, w)
-	local w = w or math.random(MAX_SIZE)
-	local h = w+2
+	w = w or math.random(MAX_SIZE)
+	local h = w + 2
 
 	for i = 0, h do
 		nodes[area:index(pos.x, pos.y+i, pos.z)] = c.stem
@@ -115,8 +115,8 @@ end
 
 
 function riesenpilz.brown(pos, nodes, area, br)
-	local br = br or math.random(MAX_SIZE-1)+1
-	local h = br+2
+	br = br or math.random(MAX_SIZE-1)+1
+	local h = br + 2
 
 	for i in area:iterp(pos, {x=pos.x, y=pos.y+h, z=pos.z}) do
 		nodes[i] = c.stem
@@ -205,7 +205,7 @@ local function ran_node(a, b, ran)
 end
 
 function riesenpilz.lavashroom(pos, nodes, area, h)
-	local h = h or 3+math.random(MAX_SIZE-2)
+	h = h or 3 + math.random(MAX_SIZE - 2)
 
 	-- remove the mushroom
 	nodes[area:indexp(pos)] = c.air
@@ -274,7 +274,7 @@ end
 
 
 function riesenpilz.glowshroom(pos, nodes, area, h)
-	local h = h or 2+math.random(MAX_SIZE)
+	h = h or 2 + math.random(MAX_SIZE)
 
 	for i = 0, h do
 		nodes[area:index(pos.x, pos.y+i, pos.z)] = c.stem_blue
@@ -323,14 +323,14 @@ end
 
 
 function riesenpilz.parasol(pos, nodes, area, w, h)
-	local h = h or 6+math.random(MAX_SIZE)
+	h = h or 6 + math.random(MAX_SIZE)
 
 	--stem
 	for i in area:iterp(pos, {x=pos.x, y=pos.y+h-2, z=pos.z}) do
 		nodes[i] = c.stem
 	end
 
-	local w = w or MAX_SIZE+math.random(2)
+	w = w or MAX_SIZE + math.random(2)
 	local bhead1 = w-1
 	local bhead2 = math.random(1,w-2)
 
@@ -418,13 +418,15 @@ function riesenpilz.red45(pos, nodes, area, h1, h2)
 					or math.random(4) ~= 2 then
 						nodes[area:index(pos.x+x*j, pos.y+h, pos.z+z*i)] = c.head_red
 					end
-					local z = z+1
-					x = x+1
-					nodes[area:index(pos.x+x*j, pos.y+walkspace+2, pos.z+z*i)] = c.head_red
-					if z ~= 3
-					or x ~= 3
+					local zo = z+1
+					local xo = x+1
+					nodes[area:index(pos.x + xo * j, pos.y + walkspace + 2,
+						pos.z + zo * i)] = c.head_red
+					if zo ~= 3
+					or xo ~= 3
 					or math.random(2) == 1 then
-						nodes[area:index(pos.x+x*j, pos.y+walkspace+3, pos.z+z*i)] = c.head_red
+						nodes[area:index(pos.x + xo * j, pos.y + walkspace + 3,
+							pos.z + zo * i)] = c.head_red
 					end
 				end
 			end
@@ -540,7 +542,7 @@ end
 local abm_allowed = true
 local disallowed_ps = {}
 
-for name,i in pairs({
+for name, ndata in pairs({
 	brown = {
 		description = "brown mushroom",
 		box = {
@@ -706,21 +708,21 @@ for name,i in pairs({
 		hp = 1,
 	},
 }) do
-	local burntime = i.burntime or 1
+	local burntime = ndata.burntime or 1
 	local box = {
 		type = "fixed",
-		fixed = i.box
+		fixed = ndata.box
 	}
-	local nd = "riesenpilz:"..name
+	local nd = "riesenpilz:" .. name
 	minetest.register_node(nd, {
-		description = i.description,
+		description = ndata.description,
 		tiles = {
 			--~ {name = "riesenpilz_"..name.."_top.png", tileable_vertical = false},
 			--~ {name = "riesenpilz_"..name.."_bottom.png", tileable_vertical = false},
 			--~ {name = "riesenpilz_"..name.."_side.png", tileable_vertical = false},
-			"riesenpilz_"..name.."_top.png",
-			"riesenpilz_"..name.."_bottom.png",
-			"riesenpilz_"..name.."_side.png",
+			"riesenpilz_" .. name .. "_top.png",
+			"riesenpilz_" .. name .. "_bottom.png",
+			"riesenpilz_" .. name .. "_side.png",
 		},
 		use_texture_alpha = "opaque",
 		inventory_image = "riesenpilz_"..name.."_side.png",
@@ -733,10 +735,10 @@ for name,i in pairs({
 		node_box = box,
 		selection_box = box,
 		furnace_burntime = burntime,
-		on_secondary_use = minetest.item_eat(i.hp),
+		on_secondary_use = minetest.item_eat(ndata.hp),
 	})
 
-	local g = i.growing
+	local g = ndata.growing
 
 	if g then
 		local grounds = g.grounds
@@ -798,8 +800,8 @@ for name,i in pairs({
 					return
 				end
 				local groups = data.groups
-				for n,i in pairs(grounds) do
-					if groups[n] ~= i then
+				for groupname, groupvalue in pairs(grounds) do
+					if groups[groupname] ~= groupvalue then
 						return
 					end
 				end
@@ -819,31 +821,31 @@ for name,i in pairs({
 			-- witch circles
 				local ps = {}
 				for _,p in pairs(riesenpilz.circle(math.random(rmin, rmax))) do
-					local p = vector.add(pos, p)
+					p = vector.add(pos, p)
 
 				-- currently 3 is used here, approved by its use in the mapgen
 					if math.random(3) == 1 then
 
 					-- don't only use the current y for them
 						for y = 1,-1,-1 do
-							local pos = {x=p.x, y=p.y+y, z=p.z}
-							if minetest.get_node(pos).name ~= "air" then
+							local pos_above = {x=p.x, y=p.y+y, z=p.z}
+							if minetest.get_node(pos_above).name ~= "air" then
 								break
 							end
 							local f = minetest.get_node({x=p.x, y=p.y+y-1, z=p.z}).name
 							if f ~= "air" then
 
 							-- they grown on specific nodes
-								local data = minetest.registered_nodes[f]
-								if data
-								and data.walkable
-								and data.groups
-								and (not data.drawtype
-									or data.drawtype == "normal"
+								local data_ground = minetest.registered_nodes[f]
+								if data_ground
+								and data_ground.walkable
+								and data_ground.groups
+								and (not data_ground.drawtype
+									or data_ground.drawtype == "normal"
 								) then
 									local ground_disallowed
 									for n,i in pairs(grounds) do
-										if data.groups[n] ~= i then
+										if data_ground.groups[n] ~= i then
 											ground_disallowed = true
 											break
 										end
@@ -851,10 +853,11 @@ for name,i in pairs({
 									if not ground_disallowed then
 
 									-- they also need specific light strengths
-										local light = minetest.get_node_light(pos, 0.5)
+										local light = minetest.get_node_light(
+											pos_above, 0.5)
 										if light >= lmin
 										and light <= lmax then
-											ps[#ps+1] = pos
+											ps[#ps+1] = pos_above
 										end
 									end
 								end
@@ -901,7 +904,7 @@ local head_sounds = default.node_sound_wood_defaults({
 local add_fence = minetest.register_fence
 local node_groups = {oddly_breakable_by_hand=3, fall_damage_add_percent=-80, bouncy=10}
 
-for _,i in pairs({
+for _, ndata in ipairs({
 	{
 		typ = "stem",
 		description = "white",
@@ -996,8 +999,8 @@ for _,i in pairs({
 	},
 }) do
 	-- fill missing stuff
-	local textures = i.textures
-	i.description = i.description or i.name
+	local textures = ndata.textures
+	ndata.description = ndata.description or ndata.name
 	if type(textures) == "string" then
 		textures = {textures}
 	end
@@ -1006,25 +1009,26 @@ for _,i in pairs({
 	end
 	local nodename = "riesenpilz:"
 	local desctiption,sounds = "giant mushroom "
-	if i.typ == "stem" then
-		desctiption = desctiption.."stem "..i.description
-		nodename = nodename.."stem"..((i.name and "_"..i.name) or "")
+	if ndata.typ == "stem" then
+		desctiption = desctiption .. "stem " .. ndata.description
+		nodename = nodename .. "stem" ..
+			((ndata.name and "_" .. ndata.name) or "")
 		sounds = default.node_sound_wood_defaults({
 			footstep = {name="riesenpilz_stem", gain=0.2},
 			place = {name="default_place_node", gain=0.5},
 			dig = {name="riesenpilz_stem", gain=0.4},
 			dug = {name="default_wood_footstep", gain=0.3}
 		})
-	elseif i.typ == "head" then
-		desctiption = desctiption.."head "..i.description
-		nodename = nodename.."head_"..i.name
+	elseif ndata.typ == "head" then
+		desctiption = desctiption .. "head " .. ndata.description
+		nodename = nodename .. "head_" .. ndata.name
 		sounds = head_sounds
 	else
-		nodename = nodename..i.name
-		desctiption = desctiption..i.description
+		nodename = nodename .. ndata.name
+		desctiption = desctiption .. ndata.description
 	end
-	local drop = i.sapling and {max_items = 1, items = {
-		{items = {"riesenpilz:"..i.sapling}, rarity = 20},
+	local drop = ndata.sapling and {max_items = 1, items = {
+		{items = {"riesenpilz:" .. ndata.sapling}, rarity = 20},
 		{items = {nodename}, rarity = 1}
 	}}
 	minetest.register_node(nodename, {
@@ -1036,7 +1040,7 @@ for _,i in pairs({
 	})
 
 	if add_fence
-	and i.fence ~= false then
+	and ndata.fence ~= false then
 		add_fence({fence_of = nodename})
 	end
 end
@@ -1149,7 +1153,7 @@ local function get_grow(name)
 			if def.on_timer then
 				func = def.on_timer
 			else
-				func = function(pos, node, player)
+				func = function(pos, _, player)
 					if def.on_place then
 						def.on_place(ItemStack(name), player, {
 							type = "node",

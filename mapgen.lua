@@ -128,7 +128,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	local t1 = os.clock()
-	riesenpilz.inform("tries to generate a giant mushroom biome at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]", 2)
+	riesenpilz.inform(("tries to generate a giant mushroom biome at: " ..
+		"x=[%d; %d]; y=[%d; %d]; z=[%d; %d]"):format(minp.x, maxp.x, minp.y,
+		maxp.y, minp.z, maxp.z), 2)
 
 	if not contents_defined then
 		define_contents()
@@ -217,8 +219,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				if ground_y then
 					-- add ground and dirt below if needed
 					data[vi] = c.ground
-					for i = -1,-5,-1 do
-						local p_pos = vi + i * area.ystride
+					for off = -1,-5,-1 do
+						local p_pos = vi + off * area.ystride
 						if not is_ground(data[p_pos])
 						or data[p_pos] == c.dirt then
 							break
