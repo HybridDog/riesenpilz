@@ -34,7 +34,7 @@ end
 
 
 local grounds = {}
-function is_ground(id)
+local function is_ground(id)
 	local is = grounds[id]
 	if is ~= nil then
 		return is
@@ -56,7 +56,7 @@ function is_ground(id)
 end
 
 local toremoves = {}
-function is_toremove(id)
+local function is_toremove(id)
 	local is = toremoves[id]
 	if is ~= nil then
 		return is
@@ -168,7 +168,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			--smooth mapgen
 			if riesenpilz.always_generate then
 				in_biome = true
-			elseif smooth then
+			elseif riesenpilz.smooth then
 				if test >= smooth_rarity_max
 				or (
 					test > smooth_rarity_min
