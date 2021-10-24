@@ -67,7 +67,8 @@ local function set_vm_data(manip, pznodes, pos, t1, name)
 		return
 	end
 	manip:write_to_map()
-	riesenpilz.inform("a giant "..name.." mushroom grew at "..vector.pos_to_string(pos), 3, t1)
+	riesenpilz.inform("a giant " .. name .. " mushroom grew at " ..
+		minetest.pos_to_string(pos), 3, t1)
 	local t1 = os.clock()
 	manip:update_map()
 	riesenpilz.inform("map updated", 3, t1)
@@ -191,7 +192,8 @@ local function riesenpilz_minecraft_fliegenpilz(pos)
 	manip:set_param2_data(param2s)
 	manip:write_to_map()
 	manip:update_map()
-	riesenpilz.inform("a fly agaric grew at "..vector.pos_to_string(pos), 3, t1)
+	riesenpilz.inform("a fly agaric grew at " .. minetest.pos_to_string(pos),
+		3, t1)
 end
 
 
@@ -501,7 +503,7 @@ local function riesenpilz_apple(pos)
 		return
 	end
 	manip:write_to_map()
-	riesenpilz.inform("an apple grew at "..vector.pos_to_string(pos), 3, t1)
+	riesenpilz.inform("an apple grew at " .. minetest.pos_to_string(pos), 3, t1)
 	manip:update_map()
 end
 
@@ -816,7 +818,7 @@ for name,i in pairs({
 
 			-- witch circles
 				local ps = {}
-				for _,p in pairs(vector.circle(math.random(rmin, rmax))) do
+				for _,p in pairs(riesenpilz.circle(math.random(rmin, rmax))) do
 					local p = vector.add(pos, p)
 
 				-- currently 3 is used here, approved by its use in the mapgen

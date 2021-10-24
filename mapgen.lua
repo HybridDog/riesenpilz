@@ -79,9 +79,9 @@ end
 
 local data = {}
 local area, pr
-function riesenpilz_circle(nam, pos, radius, chance)
-	local circle = vector.circle(radius)
-	for i = 1,#circle do
+local function make_circle(nam, pos, radius, chance)
+	local circle = riesenpilz.circle(radius)
+	for i = 1, #circle do
 		if pr:next(1, chance) == 1 then
 			local vi = area:indexp(vector.add(pos, circle[i]))
 			if data[vi] == c.air
@@ -231,13 +231,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					if pr:next(1,15) == 1 then
 						data[vi + area.ystride] = c.dry_shrub
 					elseif pr:next(1,80) == 1 then
-						riesenpilz_circle(c.riesenpilz_brown, boden, pr:next(3,4), 3)
+						make_circle(c.riesenpilz_brown, boden, pr:next(3,4), 3)
 					elseif pr:next(1,85) == 1 then
-						riesenpilz_circle(c.riesenpilz_parasol, boden, pr:next(3,5), 3)
+						make_circle(c.riesenpilz_parasol, boden, pr:next(3,5), 3)
 					elseif pr:next(1,90) == 1 then
-						riesenpilz_circle(c.riesenpilz_red, boden, pr:next(4,5), 3)
+						make_circle(c.riesenpilz_red, boden, pr:next(4,5), 3)
 					elseif pr:next(1,100) == 1 then
-						riesenpilz_circle(c.riesenpilz_fly_agaric, boden, 4, 3)
+						make_circle(c.riesenpilz_fly_agaric, boden, 4, 3)
 					elseif pr:next(1,340) == 10 then
 						bigtype = 2
 					elseif pr:next(1,380) == 1 then
@@ -247,9 +247,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					elseif pr:next(1,800) == 7 then
 						bigtype = 5
 					elseif pr:next(1,4000) == 1 then
-						riesenpilz_circle(c.riesenpilz_lavashroom, boden, pr:next(5,6), 3)
+						make_circle(c.riesenpilz_lavashroom, boden, pr:next(5,6), 3)
 					elseif pr:next(1,5000) == 1 then
-						riesenpilz_circle(c.riesenpilz_glowshroom, boden, 3, 3)
+						make_circle(c.riesenpilz_glowshroom, boden, 3, 3)
 					elseif pr:next(1,6000) == 2 then
 						if pr:next(1,200) == 15 then
 							bigtype = 4
