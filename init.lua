@@ -708,7 +708,6 @@ for name, ndata in pairs({
 		hp = 1,
 	},
 }) do
-	local burntime = ndata.burntime or 1
 	local box = {
 		type = "fixed",
 		fixed = ndata.box
@@ -734,8 +733,13 @@ for name, ndata in pairs({
 		sounds =  default.node_sound_leaves_defaults(),
 		node_box = box,
 		selection_box = box,
-		furnace_burntime = burntime,
 		on_secondary_use = minetest.item_eat(ndata.hp),
+	})
+
+	minetest.register_craft({
+		type = "fuel",
+		recipe = nd,
+		burntime = ndata.burntime or 1,
 	})
 
 	local g = ndata.growing
