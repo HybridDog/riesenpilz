@@ -22,4 +22,4 @@ TODO:
 * Add new features:
   * Add more giant mushrooms
   * Add more content from the mushrooms mod
-  * Add a lava suit
+  * Add a lava suit (see also the undone commit 737bbf6c008317e9934787d9e4865742299970f3)
