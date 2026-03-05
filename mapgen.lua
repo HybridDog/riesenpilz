@@ -127,7 +127,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 	riesenpilz.inform(("tries to generate a giant mushroom biome at: " ..
 		"x=[%d; %d]; y=[%d; %d]; z=[%d; %d]"):format(minp.x, maxp.x, minp.y,
 		maxp.y, minp.z, maxp.z), 2)
@@ -167,10 +167,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			--Check if we are in a "riesenpilz biome"
 			local in_biome = false
 			local test = perlin1:get2d({x=x, y=z})
-			--smooth mapgen
 			if riesenpilz.always_generate then
 				in_biome = true
-			elseif riesenpilz.smooth then
+			elseif riesenpilz.smooth_biome_transitions then
 				if test >= smooth_rarity_max
 				or (
 					test > smooth_rarity_min
@@ -272,7 +271,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local param2s
 	if num ~= 1 then
-		local t2 = os.clock()
+		local t2 = minetest.get_us_time()
 		for _,v in pairs(tab) do
 			local p = v[2]
 
@@ -325,7 +324,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		riesenpilz.inform("giant shrooms generated", 2, t2)
 	end
 
-	local t2 = os.clock()
+	local t2 = minetest.get_us_time()
 	vm:set_data(data)
 	if param2s then
 		vm:set_param2_data(param2s)

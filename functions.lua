@@ -1,14 +1,15 @@
-if riesenpilz.info then
+if riesenpilz.log_level > 0 then
 	function riesenpilz.inform(msg, spam, t)
-		if spam <= riesenpilz.max_spam then
+		if spam <= riesenpilz.log_level then
 			local info
 			if t then
-				info = string.format("[riesenpilz] "..msg.." after ca. %.2fs", os.clock() - t)
+				info = "[riesenpilz] " .. msg .. (" after ca. %.3g s"):format(
+					(minetest.get_us_time() - t) / 1000000)
 			else
 				info = "[riesenpilz] "..msg
 			end
-			print(info)
-			if riesenpilz.inform_all then
+			minetest.log("info", info)
+			if riesenpilz.log_to_chat then
 				minetest.chat_send_all(info)
 			end
 		end

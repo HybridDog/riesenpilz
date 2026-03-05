@@ -68,7 +68,7 @@ local function set_vm_data(manip, pznodes, pos, t1, name)
 	manip:write_to_map()
 	riesenpilz.inform("a giant " .. name .. " mushroom grew at " ..
 		minetest.pos_to_string(pos), 3, t1)
-	local t2 = os.clock()
+	local t2 = minetest.get_us_time()
 	manip:update_map()
 	riesenpilz.inform("map updated", 3, t2)
 end
@@ -99,7 +99,7 @@ function riesenpilz.red(pos, nodes, area, w)
 end
 
 local function riesenpilz_hybridpilz(pos)
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 	local w = math.random(MAX_SIZE)
 
@@ -134,7 +134,7 @@ function riesenpilz.brown(pos, nodes, area, br)
 end
 
 local function riesenpilz_brauner_minecraftpilz(pos)
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 	local br = math.random(MAX_SIZE-1)+1
 
@@ -176,7 +176,7 @@ function riesenpilz.fly_agaric(pos, nodes, area, param2s)
 end
 
 local function riesenpilz_minecraft_fliegenpilz(pos)
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, 2, 4, pos)
@@ -258,7 +258,7 @@ function riesenpilz.lavashroom(pos, nodes, area, h)
 end
 
 local function riesenpilz_lavashroom(pos)
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 	local h = 3+math.random(MAX_SIZE-2)
 
@@ -307,7 +307,7 @@ function riesenpilz.glowshroom(pos, nodes, area, h)
 end
 
 local function riesenpilz_glowshroom(pos)
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 	local h = 2+math.random(MAX_SIZE)
 
@@ -360,7 +360,7 @@ function riesenpilz.parasol(pos, nodes, area, w, h)
 end
 
 local function riesenpilz_parasol(pos)
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 	local w = MAX_SIZE+math.random(2)
 	local h = 6+math.random(MAX_SIZE)
@@ -441,7 +441,7 @@ function riesenpilz.red45(pos, nodes, area, h1, h2)
 end
 
 local function riesenpilz_red45(pos)
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 	local h1 = math.random(2,MAX_SIZE)
 	local h2 = math.random(MAX_SIZE)
@@ -493,7 +493,7 @@ end
 
 local function riesenpilz_apple(pos)
 
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 	local manip = minetest.get_voxel_manip()
 	local area = r_area(manip, 5, 14, pos)
 
@@ -513,7 +513,7 @@ end
 -- 3D apple [3apple]
 
 
-if riesenpilz.change_apple then
+if riesenpilz.default_apple_3d then
 	minetest.override_item("default:apple", {
 		drawtype = "nodebox",
 		tiles = {"3apple_apple_top.png", "3apple_apple_bottom.png", "3apple_apple.png"},

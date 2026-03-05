@@ -14,7 +14,6 @@ If you got ideas or found bugs, please tell them to me.
 TODO:
 * Mapgen: Do not use a fixed table of tree nodes; instead use a more flexible
   way to remove trees.
-* Add a settingtypes.txt
 * Make the growingtool craftable
 * Test if visual_scale is useful for the small mushroom nodes,
   e.g. to make textures smaller or to use power-of-two sized textures.

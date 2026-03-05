@@ -1,25 +1,26 @@
---This file contains configuration options for riesenpilz mod.
+local default_settings = {
+	enable_mapgen = false,
+	always_generate = false,
+	smooth_biome_transitions = true,
+	log_to_chat = false,
+	log_level = 2,
+	default_apple_3d = true,
+	giant_restrict_area = false,
+}
 
--- mapgen size etc. does not work
-riesenpilz.enable_mapgen = false
-
---Generate giant mushroom biomes everywhere
-riesenpilz.always_generate = false
-
---Enables smooth transition of biomes.
-riesenpilz.smooth = true
-
---says some information.
-riesenpilz.info = true
-
---informs the players too
-riesenpilz.inform_all = false--minetest.is_singleplayer()
-
---1:<a bit of information> 2:<acceptable amount of information> 3:<lots of text>
-riesenpilz.max_spam = 2
-
---3d apple
-riesenpilz.change_apple = true
-
---disallows growing a mushroom if it not every node would have a free place
-riesenpilz.giant_restrict_area = false
+for name,dv in pairs(default_settings) do
+	local setting
+	local setting_name = "riesenpilz."..name
+	if type(dv) == "boolean" then
+		setting = minetest.settings:get_bool(setting_name)
+	elseif type(dv) == "number" then
+		setting = tonumber(minetest.settings:get(setting_name))
+	else
+		error"[riesenpilz] Only boolean and number settings are available"
+	end
+	if setting == nil then
+		riesenpilz[name] = dv
+	else
+		riesenpilz[name] = setting
+	end
+end
