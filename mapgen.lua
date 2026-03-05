@@ -113,7 +113,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local biome_allowed
 		for x = x0, x1, 16 do
 			for z = z0, z1, 16 do
-				if perlin1:get2d({x=x, y=z}) > nosmooth_rarity then
+				if perlin1:get_2d({x=x, y=z}) > nosmooth_rarity then
 					biome_allowed = true
 					break
 				end
@@ -166,7 +166,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			--Check if we are in a "riesenpilz biome"
 			local in_biome = false
-			local test = perlin1:get2d({x=x, y=z})
+			local test = perlin1:get_2d({x=x, y=z})
 			if riesenpilz.always_generate then
 				in_biome = true
 			elseif riesenpilz.smooth_biome_transitions then
