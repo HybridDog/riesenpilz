@@ -1,4 +1,3 @@
-local load_time_start = os.clock()
 local MAX_SIZE = 3
 
 riesenpilz = {}
@@ -1222,12 +1221,3 @@ end
 
 
 minetest.register_alias("riesenpilz:head_binge", "riesenpilz:head_beige")
-
-
-local time = math.floor(tonumber(os.clock()-load_time_start)*100+0.5)/100
-local msg = "[riesenpilz] loaded after ca. "..time
-if time > 0.05 then
-	print(msg)
-else
-	minetest.log("info", msg)
-end
